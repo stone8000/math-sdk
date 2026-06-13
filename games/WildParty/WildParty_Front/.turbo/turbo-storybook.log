@@ -1,0 +1,94 @@
+
+
+> lines@0.0.0 storybook /Users/stone/Stake_Engine/web-sdk/apps/lines
+> PUBLIC_CHROMATIC=true storybook dev -p 6001 public
+
+[1mstorybook v9.0.15[22m[0m
+[0m
+You are currently using Storybook [1m9.0.15[22m but you have packages which are incompatible with it:
+
+- @storybook/addon-svelte-csf@5.0.5 which depends on ^0.1.13
+
+Please consider updating your packages or contacting the maintainers for compatibility details.
+
+For more on Storybook 9 compatibility, see the linked GitHub issue:
+https://github.com/storybookjs/storybook/issues/30944
+(node:11676) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[34mAttention:[39m Storybook now collects completely anonymous telemetry regarding usage. This information is used to shape Storybook's roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+[36mhttps://storybook.js.org/telemetry[39m
+
+[32minfo[0m[35m[0m => Serving static files from [36m././static[39m at [36m/[39m
+[0m[32minfo[0m[35m[0m => Starting manager..
+[0mNo story files found for the specified pattern: [34msrc/**/*.mdx[39m
+CSF Parsing error: Expected 'ObjectExpression' but found 'undefined' instead in 'Identifier'.
+CSF Parsing error: Expected 'ObjectExpression' but found 'undefined' instead in 'Identifier'.
+[32minfo[0m[35m[0m => Starting preview..
+[0m[1m[31mThe following Vite config options will be overridden by SvelteKit:[22m[39m
+  - base
+[2m1:44:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Forced re-optimization of dependencies
+[38;2;241;97;140m╭──────────────────────────────────────────────────────────────────────────────────────────╮[39m
+[38;2;241;97;140m│[39m                                                                                          [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m   [38;2;162;224;94mStorybook [1m9.0.15[22m for [1msveltekit[22m started[39m                                                 [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m   [90m[4m215 ms[24m for manager and [4m449 ms[24m for preview[39m                                              [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m                                                                                          [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m    Local:            [36mhttp://localhost:6001/[39m                                              [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m    On your network:  [36mhttp://192.168.0.184:6001/[39m                                          [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m                                                                                          [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m   [38;2;243;173;56mA new version ([1m10.4.0[22m) is available![39m                                                   [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m                                                                                          [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m   [90mUpgrade now:[39m [38;2;162;224;94mnpx storybook@latest upgrade[39m                                              [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m                                                                                          [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m   [90mRead full changelog:[39m [90m[4mhttps://github.com/storybookjs/storybook/blob/main/CHANGELOG.md[24m[39m   [38;2;241;97;140m│[39m
+[38;2;241;97;140m│[39m                                                                                          [38;2;241;97;140m│[39m
+[38;2;241;97;140m╰──────────────────────────────────────────────────────────────────────────────────────────╯[39m
+CSF Parsing error: Expected 'ObjectExpression' but found 'undefined' instead in 'Identifier'.
+CSF Parsing error: Expected 'ObjectExpression' but found 'undefined' instead in 'Identifier'.
+[36m1:44:49 PM [vite-plugin-svelte] /Users/stone/Stake_Engine/web-sdk/packages/components-ui-html/src/components/Modals.svelte:42:2 No scopable elements found in template. If you're using global styles in the style tag, you should move it into an external stylesheet file and import it in JS. See https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md#where-should-i-put-my-global-styles.[39m
+
+<--- Last few GCs --->
+
+[11676:0x148008000]    99826 ms: Mark-Compact (reduce) 2026.3 (2055.7) -> 2005.5 (2029.6) MB, pooled: 0 MB, 496.12 / 0.00 ms  (+ 130.0 ms in 100 steps since start of marking, biggest step 5.5 ms, walltime since start of marking 738 ms) (average mu = 0.930[11676:0x148008000]   101716 ms: Mark-Compact (reduce) 2027.7 (2051.7) -> 2027.6 (2051.0) MB, pooled: 0 MB, 772.12 / 0.00 ms  (+ 0.0 ms in 0 steps since start of marking, biggest step 0.0 ms, walltime since start of marking 1423 ms) (average mu = 0.874, c
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x1010e20fc node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/usr/local/bin/node]
+ 2: 0x10133e4b8 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/local/bin/node]
+ 3: 0x10159d8a4 v8::internal::Heap::stack() [/usr/local/bin/node]
+ 4: 0x10159b78c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/local/bin/node]
+ 5: 0x1015902b4 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/local/bin/node]
+ 6: 0x10155f388 v8::internal::FactoryBase<v8::internal::Factory>::NewRawOneByteString(int, v8::internal::AllocationType) [/usr/local/bin/node]
+ 7: 0x10155f1c4 v8::internal::FactoryBase<v8::internal::Factory>::NewStringFromOneByte(v8::base::Vector<unsigned char const>, v8::internal::AllocationType) [/usr/local/bin/node]
+ 8: 0x1016c561c v8::internal::JsonStringifier::Stringify(v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Object>) [/usr/local/bin/node]
+ 9: 0x1016cb64c v8::internal::JsonStringify(v8::internal::Isolate*, v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Object>) [/usr/local/bin/node]
+10: 0x1013bae00 v8::internal::Builtin_JsonStringify(int, unsigned long*, v8::internal::Isolate*) [/usr/local/bin/node]
+11: 0x102056154 Builtins_CEntry_Return1_ArgvOnStack_BuiltinExit [/usr/local/bin/node]
+12: 0x120ecc35c 
+13: 0x120ecc69c 
+14: 0x120eccedc 
+15: 0x120ed0b60 
+16: 0x101ff77e8 Builtins_AsyncFunctionAwaitResolveClosure [/usr/local/bin/node]
+17: 0x1020cce58 Builtins_PromiseFulfillReactionJob [/usr/local/bin/node]
+18: 0x101fe6bd0 Builtins_RunMicrotasks [/usr/local/bin/node]
+19: 0x101fb67b0 Builtins_JSRunMicrotasksEntry [/usr/local/bin/node]
+20: 0x1014e1a4c v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/usr/local/bin/node]
+21: 0x1014e22c0 v8::internal::(anonymous namespace)::InvokeWithTryCatch(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/usr/local/bin/node]
+22: 0x1014e23fc v8::internal::Execution::TryRunMicrotasks(v8::internal::Isolate*, v8::internal::MicrotaskQueue*) [/usr/local/bin/node]
+23: 0x1015111d0 v8::internal::MicrotaskQueue::RunMicrotasks(v8::internal::Isolate*) [/usr/local/bin/node]
+24: 0x101511b30 v8::internal::MicrotaskQueue::PerformCheckpoint(v8::Isolate*) [/usr/local/bin/node]
+25: 0x100fc30b8 node::InternalCallbackScope::Close() [/usr/local/bin/node]
+26: 0x100fc33b0 node::InternalMakeCallback(node::Environment*, v8::Local<v8::Object>, v8::Local<v8::Object>, v8::Local<v8::Function>, int, v8::Local<v8::Value>*, node::async_context, v8::Local<v8::Value>) [/usr/local/bin/node]
+27: 0x100fdbdd0 node::AsyncWrap::MakeCallback(v8::Local<v8::Function>, int, v8::Local<v8::Value>*) [/usr/local/bin/node]
+28: 0x1010e8fc8 node::fs::FSReqCallback::Resolve(v8::Local<v8::Value>) [/usr/local/bin/node]
+29: 0x1010e96d0 node::fs::AfterNoArgs(uv_fs_s*) [/usr/local/bin/node]
+30: 0x1010d7b4c node::MakeLibuvRequestCallback<uv_fs_s, void (*)(uv_fs_s*)>::Wrapper(uv_fs_s*) [/usr/local/bin/node]
+31: 0x101f91e24 uv__work_done [/usr/local/bin/node]
+32: 0x101f95874 uv__async_io [/usr/local/bin/node]
+33: 0x101faa16c uv__io_poll [/usr/local/bin/node]
+34: 0x101f961c8 uv_run [/usr/local/bin/node]
+35: 0x100fc46a8 node::SpinEventLoopInternal(node::Environment*) [/usr/local/bin/node]
+36: 0x10113b00c node::NodeMainInstance::Run() [/usr/local/bin/node]
+37: 0x10108ed14 node::Start(int, char**) [/usr/local/bin/node]
+38: 0x18910ff28 start [/usr/lib/dyld]
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed.[39m

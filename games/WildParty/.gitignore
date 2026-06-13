@@ -1,0 +1,10 @@
+# Frontend
+WildParty_Front/node_modules/
+WildParty_Front/.svelte-kit/
+
+# Python
+__pycache__/
+*.pyc
+
+# Local skills clone (separate repo)
+Slot-Casino-Game-Developer-Skills-for-Stake-Engine/

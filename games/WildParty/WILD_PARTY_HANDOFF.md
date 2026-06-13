@@ -1,8 +1,8 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-06-11（含上傳說明、Thumbnail／Foreground）  
+> 最後更新：2026-06-13（Git 版控、loader 子路徑修復、可玩版 commit）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
-> 對話來源：Cursor 多輪協作（math 規格實作 → 前端對接 → 視覺設計 → 符號美術 → 遊戲說明 → 上傳／Thumbnail）
+> 對話來源：Cursor 多輪協作（math 規格實作 → 前端對接 → 視覺設計 → 符號美術 → 上傳修復 → 版控）
 
 ---
 
@@ -139,6 +139,7 @@ run_conditions = {
 ```
 games/WildParty/
 ├── WILD_PARTY_HANDOFF.md          ← 本文件
+├── .gitignore                     ← node_modules / .svelte-kit 等
 ├── run.py                         ← 主執行：模擬、產書、產 config、優化、驗證
 ├── game_config.py                 ← 遊戲數學設定（規格源頭）
 ├── gamestate.py
@@ -235,7 +236,9 @@ games/WildParty/
 ### 4.6 建置與環境
 
 - [x] `fix_links.py`：修復 `WildParty_Front` 搬出 web-sdk 後斷掉的 pnpm symlink
-- [x] `pnpm build` 成功 → `WildParty_Front/build/` 可上傳（最後成功建置約 2026-06-11 08:53）
+- [x] `games/WildParty/.gitignore`：排除 `node_modules/`、`.svelte-kit/` 等
+- [x] **Git 版控**：Wild Party 已納入 `math-sdk` repo（2026-06-13）
+- [x] `pnpm build` 成功 → `WildParty_Front/build/` 可上傳（**目前可玩版 build：2026-06-13 23:07**，commit `f7ec76e`）
 
 ### 4.7 Stake Engine 上架素材（Thumbnail / Foreground）
 
@@ -257,20 +260,32 @@ games/WildParty/
 - [ ] **符號 spine 中獎動畫**（目前全狀態用 sprite；架構已預留）
 - [ ] **web-sdk 共享套件層級**修改（若要把 PayTable/Rules 寫回共用庫而非 app 本地覆寫）
 
-### 4.9 第二波前端優化工作（已完成）
+### 4.9 第二波前端優化（已實作後撤回）
 
-**已完成實作 (2026-06-12)：**
-- [x] **中獎線圖 (WinLines.svelte)**
-  - 實作 PixiJS `Graphics` 繪製，為不同符號類型分配色彩（高分金色、低分紫色、Wild粉紅）並呈現霓虹雙層光暈。
-  - 對接 `winInfo` 事件，連線時以一條接一條節奏展示（每條顯示 600ms，間隔 150ms 播下一條），並同步播放符號 win 動畫。
-- [x] **Wild 飛行動畫減速**
-  - 重寫 `updateGlobalMult` 機制，改為 `await` 飛行事件，實現一顆打完、間隔 250ms、再發下一顆的循序播放效果。
-  - 單顆飛行時間從 400ms 慢速至 600ms，快速/Turbo 模式下限調至 350ms，節奏更加流暢舒服。
-- [x] **Loading 頁面品牌化**
-  - 移除預設 Spine 資源，改用 `Text` 原生渲染雙層金-紫漸層 "WILD PARTY" 標題，配合粉色呼吸 LOADING... 標示。
-  - 透過 `LoadingProgress` 結合自訂 `Graphics` 繪製高質感的霓虹進度條，並加入 25 顆色彩絢麗的浮動粒子特效。
-- [x] **按鈕全局高級感優化**
-  - 於 `Modals.svelte` 全面覆寫 `:global` 樣式：Spin 按鈕粉紫漸層搭配呼吸陰影與按壓回彈，Modal 按鈕暗黑漸層底配金色半透明邊框，Buy Bonus 按鈕金色高亮質感，自訂 sliders 滑桿樣式等。
+2026-06-12 曾實作 WinLines、Wild 飛行減速、Loading 品牌化、按鈕 CSS 等，上傳後出現黑屏／無法遊玩，**已全部撤回**，恢復交接版（共享 `UI`、Spine Loading、`LoaderStakeEngine` 流程）。
+
+| 項目 | 狀態 |
+|------|------|
+| WinLines / WildMultiplierFly / WildPartyUI | 已刪除 |
+| `+layout.svelte` | 恢復 `LoaderStakeEngine` + `LoaderExample` |
+| `LoadingScreen.svelte` | 恢復 Spine 範本 loader |
+| `bookEventHandlerMap.ts` | lines 範本 + Wild Party 擴充（倍數、retrigger、wincap） |
+
+> 若日後重做 UI 升級，**先開 git 分支**，每步 `pnpm build` + 本機／Stake 測試後再 commit。
+
+### 4.10 上傳黑屏修復（2026-06-13）— 目前可玩版
+
+**症狀：** Stake 後台 Play Game 全黑，中央破圖 `loader`。
+
+**根因：** `+layout.svelte` 用 `new URL('../../stake-engine-loader.gif', import.meta.url)`；Stake 子路徑部署時 GIF 404 → 預載失敗 → 遊戲不掛載。
+
+**修復：**
+
+1. `src/routes/+layout.svelte` — 改用 `$app/paths` 的 `base`：`${base}/stake-engine-loader.gif`、`${base}/loader.gif`
+2. `vite.config.js` — `base: './'`
+3. 重建 `build/`，commit **`f7ec76e`**
+
+**上傳：** 整包 `build/` 須含根目錄 `stake-engine-loader.gif`、`loader.gif`。
 
 ---
 
@@ -340,6 +355,47 @@ pnpm build
 - `~/Stake_Engine/math-sdk`
 - `~/Stake_Engine/web-sdk`（讀共享套件、必要時改 components-ui-html）
 
+### 5.6 Git 版控（必做）
+
+詳細規則見 Cursor skill **`stake-engine-local-dev`** →「版控（Git）— 必做」。**每次改動 Wild Party 後都要 commit，訊息須註明改動內容與原因。**
+
+```bash
+cd ~/Stake_Engine/math-sdk
+
+git status
+git diff games/WildParty/
+
+# 若改前端且要上傳 Stake，先 build 再 commit
+cd games/WildParty/WildParty_Front && pnpm build && cd ../../..
+
+git add games/WildParty/
+git commit -m "描述這次改了什麼、為什麼改"
+
+git log --oneline games/WildParty/    # 查歷史
+git push origin main                  # 備份遠端（可選）
+```
+
+**還原 Wild Party 到某快照：**
+
+```bash
+git checkout f7ec76e -- games/WildParty/   # 目前可玩版
+```
+
+**大改前開分支：**
+
+```bash
+git checkout -b feature/ui-v2
+# …改完測試通過…
+git checkout main && git merge feature/ui-v2
+```
+
+| Commit | 說明 |
+|--------|------|
+| `f34f4ee` | Baseline：math + 前端 + build |
+| `f7ec76e` | **可玩／可上傳版**（loader 子路徑 + vite base） |
+
+**不會被 git 追蹤：** `library/`（重跑 `run.py`）、`node_modules/`、`.svelte-kit/`。
+
 ---
 
 ## 6. 關鍵檔案對照表
@@ -372,6 +428,8 @@ pnpm build
 | `src/components/ui/ModalGameRules.svelte` | 遊戲規則 |
 | `static/assets/sprites/wildPartySymbols/` | 符號 PNG |
 | `static/assets/sprites/wildPartyBackground/` | 背景 PNG |
+| `src/routes/+layout.svelte` | Loader 路徑（`${base}/stake-engine-loader.gif`） |
+| `vite.config.js` | `base: './'`（Stake 子路徑部署） |
 | `build/` | **上傳前端** |
 
 ### 上架素材（Stake 後台，非 build 內）
@@ -510,12 +568,14 @@ pnpm build
 | 缺少 `updateGlobalMult` 等 handler → console error | 補 `typesBookEvent` + `bookEventHandlerMap` |
 | `INITIAL_BOARD` 引用不存在的 `L5` | 改為 WildParty 有效符號 |
 | `WildParty_Front` 搬出 web-sdk 後 build 失敗 | 執行 `fix_links.py` |
+| **Stake Play Game 黑屏、破圖 loader** | `+layout.svelte` 改用 `${base}/stake-engine-loader.gif`；`vite.config.js` 設 `base: './'`；整包上傳 `build/`（含根目錄兩個 gif）；commit `f7ec76e` |
+| 改壞無法還原 | 2026-06 前未 commit；現已納入 git，見 §5.6、`stake-engine-local-dev` skill |
 | 無法寫入 `web-sdk/apps/WildParty`（sandbox） | 在 math-sdk 內維護 `WildParty_Front` |
 | AI 符號圖無真透明通道 | `process_symbols.py` flood-fill 去棋盤格 |
 | `components-ui-html` 無法在工作區修改 | app 內本地 `Modals` + PayTable/Rules 覆寫 |
 | `pnpm build \| tail` 看似卡住 | esbuild 子進程；看 `build/` 時間戳或寫 log 檔；手動 kill 卡住的 build 進程 |
 | 滾動中與靜止中的 rows 座標映射有 offset | 使用 book 事件帶來的 `win.positions` 進行直接映射，不額外依賴 row 偏移 |
-| 前端 framework 預載的 Spine 資源 `loader` 導致 Loading 頁卡住 | 移除舊 Spine 資源，改用原生 PixiJS `Text` 霓虹雙層標題 + `Graphics` 霓虹進度條與粒子特效，完成品牌主題化 |
+| 前端 framework 預載的 Spine 資源 `loader` 導致 Loading 頁卡住 | 維持範本 Spine LoadingScreen；勿在未測子路徑部署前改 Loader 流程 |
 
 ---
 
@@ -572,7 +632,9 @@ bgm_base (loop), bgm_freegame (loop)
 | 11 | 產 Foreground | `design/foreground_wild_party.png`（迪斯可球、透明、無文字） |
 | 12 | 更新交接文件 | 補上傳／Thumbnail 章節 |
 | 13 | 第二波前端升級規劃 | 完成規格確認、設計一條條連線/飛行減速/Loading優化/按鈕美化計畫並獲得確認 |
-| 14 | 第二波前端升級實作 | （已退回 V7）因不滿意動畫與節奏，已完全撤銷 V8 所有改動，回復至上一個穩定版本 |
+| 14 | 第二波前端升級實作 | 已撤回（黑屏）；恢復交接版 |
+| 15 | Git baseline + loader 修復 | `f34f4ee`、`f7ec76e`；Stake 可玩 |
+| 16 | 版控寫入 skill + 更新交接 | `stake-engine-local-dev`、本文件 §4.10 / §5.6 |
 
 ---
 
@@ -598,12 +660,16 @@ bgm_base (loop), bgm_freegame (loop)
 # Math：publish_files 存在且 index.json 有效
 ls games/WildParty/library/publish_files/index.json
 
+# Git：Wild Party 有 commit 歷史
+cd ~/Stake_Engine/math-sdk && git log --oneline -3 games/WildParty/
+
 # Frontend：符號與 build
 ls games/WildParty/WildParty_Front/static/assets/sprites/wildPartySymbols/*.png | wc -l
 # 應為 10
 
 cd games/WildParty/WildParty_Front && pnpm build
 ls build/index.html
+ls build/stake-engine-loader.gif build/loader.gif
 
 # Thumbnail 素材
 ls games/WildParty/design/thumbnail_wild_party.png

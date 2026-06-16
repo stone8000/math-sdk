@@ -1,8 +1,8 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-06-13（Git 版控、loader 子路徑修復、可玩版 commit）  
+> 最後更新：2026-06-14（Git push 至 fork、Stake 可玩確認、版控流程定稿）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
-> 對話來源：Cursor 多輪協作（math 規格實作 → 前端對接 → 視覺設計 → 符號美術 → 上傳修復 → 版控）
+> 對話來源：Cursor 多輪協作（math → 前端 → 上傳修復 → Git 版控 → 遠端備份）
 
 ---
 
@@ -238,7 +238,9 @@ games/WildParty/
 - [x] `fix_links.py`：修復 `WildParty_Front` 搬出 web-sdk 後斷掉的 pnpm symlink
 - [x] `games/WildParty/.gitignore`：排除 `node_modules/`、`.svelte-kit/` 等
 - [x] **Git 版控**：Wild Party 已納入 `math-sdk` repo（2026-06-13）
-- [x] `pnpm build` 成功 → `WildParty_Front/build/` 可上傳（**目前可玩版 build：2026-06-13 23:07**，commit `f7ec76e`）
+- [x] **遠端備份**：已 push 至 fork https://github.com/stone8000/math-sdk（remote 名稱 `mine`，2026-06-14）
+- [x] **Stake 可玩確認**：上傳 `build/` 後 Play Game 正常（loader 修復後，使用者確認 2026-06-13）
+- [x] `pnpm build` 成功 → `WildParty_Front/build/` 可上傳（**目前可玩版 build：2026-06-13 23:07**，commit `d0909df`）
 
 ### 4.7 Stake Engine 上架素材（Thumbnail / Foreground）
 
@@ -283,9 +285,41 @@ games/WildParty/
 
 1. `src/routes/+layout.svelte` — 改用 `$app/paths` 的 `base`：`${base}/stake-engine-loader.gif`、`${base}/loader.gif`
 2. `vite.config.js` — `base: './'`
-3. 重建 `build/`，commit **`f7ec76e`**
+3. 重建 `build/`，commit **`d0909df`**
+4. **使用者確認**：Stake 後台 Play Game 可正常進入遊戲
 
 **上傳：** 整包 `build/` 須含根目錄 `stake-engine-loader.gif`、`loader.gif`。
+
+### 4.11 Git 遠端備份與 push（2026-06-14）
+
+**遠端設定：**
+
+| Remote | URL | 用途 |
+|--------|-----|------|
+| `origin` | `https://github.com/StakeEngine/math-sdk` | 官方上游（通常只 pull，勿 push） |
+| `mine` | `https://github.com/stone8000/math-sdk` | **自己的 fork**，Wild Party 備份與 push 目標 |
+
+**已 push 的 Wild Party commit（rebase 後 hash，以 `main` 為準）：**
+
+| Commit | 說明 |
+|--------|------|
+| `42fda6d` | Baseline：math + 前端 + build |
+| `d0909df` | Loader 子路徑修復（**可玩／可上傳版**） |
+| `0f0af7c` | 交接文件 + 版控說明 |
+
+**連結：**
+- Repo：https://github.com/stone8000/math-sdk
+- Wild Party 目錄：https://github.com/stone8000/math-sdk/tree/main/games/WildParty
+
+**push 若被拒（遠端較新）：** 先 `git fetch mine` → `git rebase mine/main` → 再 push。
+
+**push 若 HTTP 500（build 約 60MB）：**
+
+```bash
+git -c http.version=HTTP/1.1 -c http.postBuffer=524288000 push mine main
+```
+
+**Skill 版控規則：** Cursor `@stake-engine-local-dev` 已寫入「**每次改動必 commit**」；Agent 與接手者皆應遵守。
 
 ---
 
@@ -355,9 +389,16 @@ pnpm build
 - `~/Stake_Engine/math-sdk`
 - `~/Stake_Engine/web-sdk`（讀共享套件、必要時改 components-ui-html）
 
-### 5.6 Git 版控（必做）
+### 5.6 Git 版控（必做 — 每次改動都要 commit）
 
-詳細規則見 Cursor skill **`stake-engine-local-dev`** →「版控（Git）— 必做」。**每次改動 Wild Party 後都要 commit，訊息須註明改動內容與原因。**
+詳細規則見 Cursor skill **`stake-engine-local-dev`** →「版控（Git）— 必做」。
+
+**硬性規則：**
+1. **每次**改 math、前端、design、交接文件或 build → **必須 `git commit`**
+2. commit 訊息須寫清 **改了什麼、為什麼改**
+3. 改前端且要上傳 Stake → **先 `pnpm build`**，再 commit（含 `build/`）
+4. 大改（UI／動畫實驗）→ **先開分支**，通過測試再 merge
+5. 需要遠端備份 → `git push mine main`（勿 push 到官方 `origin`）
 
 ```bash
 cd ~/Stake_Engine/math-sdk
@@ -372,13 +413,17 @@ git add games/WildParty/
 git commit -m "描述這次改了什麼、為什麼改"
 
 git log --oneline games/WildParty/    # 查歷史
-git push origin main                  # 備份遠端（可選）
+
+# 備份到自己的 fork（非官方 origin）
+git fetch mine
+git rebase mine/main                # 若 push 被拒再做
+git -c http.version=HTTP/1.1 -c http.postBuffer=524288000 push mine main
 ```
 
-**還原 Wild Party 到某快照：**
+**還原 Wild Party 到可玩版：**
 
 ```bash
-git checkout f7ec76e -- games/WildParty/   # 目前可玩版
+git checkout d0909df -- games/WildParty/
 ```
 
 **大改前開分支：**
@@ -391,8 +436,11 @@ git checkout main && git merge feature/ui-v2
 
 | Commit | 說明 |
 |--------|------|
-| `f34f4ee` | Baseline：math + 前端 + build |
-| `f7ec76e` | **可玩／可上傳版**（loader 子路徑 + vite base） |
+| `42fda6d` | Baseline：math + 前端 + build |
+| `d0909df` | **可玩／可上傳版**（loader 子路徑 + vite base） |
+| `0f0af7c` | 交接文件 + 版控說明 |
+
+**遠端：** https://github.com/stone8000/math-sdk（`mine`）
 
 **不會被 git 追蹤：** `library/`（重跑 `run.py`）、`node_modules/`、`.svelte-kit/`。
 
@@ -568,8 +616,10 @@ pnpm build
 | 缺少 `updateGlobalMult` 等 handler → console error | 補 `typesBookEvent` + `bookEventHandlerMap` |
 | `INITIAL_BOARD` 引用不存在的 `L5` | 改為 WildParty 有效符號 |
 | `WildParty_Front` 搬出 web-sdk 後 build 失敗 | 執行 `fix_links.py` |
-| **Stake Play Game 黑屏、破圖 loader** | `+layout.svelte` 改用 `${base}/stake-engine-loader.gif`；`vite.config.js` 設 `base: './'`；整包上傳 `build/`（含根目錄兩個 gif）；commit `f7ec76e` |
-| 改壞無法還原 | 2026-06 前未 commit；現已納入 git，見 §5.6、`stake-engine-local-dev` skill |
+| **Stake Play Game 黑屏、破圖 loader** | `+layout.svelte` 改用 `${base}/stake-engine-loader.gif`；`vite.config.js` 設 `base: './'`；整包上傳 `build/`；commit `d0909df` |
+| 改壞無法還原 | 2026-06 前未 commit；現已納入 git + push 至 `mine`，見 §5.6、§4.11 |
+| `git push` 被拒（fetch first） | `git fetch mine` → `git rebase mine/main` → 再 push |
+| `git push` HTTP 500（~60MB build） | `git -c http.version=HTTP/1.1 -c http.postBuffer=524288000 push mine main` |
 | 無法寫入 `web-sdk/apps/WildParty`（sandbox） | 在 math-sdk 內維護 `WildParty_Front` |
 | AI 符號圖無真透明通道 | `process_symbols.py` flood-fill 去棋盤格 |
 | `components-ui-html` 無法在工作區修改 | app 內本地 `Modals` + PayTable/Rules 覆寫 |
@@ -633,8 +683,10 @@ bgm_base (loop), bgm_freegame (loop)
 | 12 | 更新交接文件 | 補上傳／Thumbnail 章節 |
 | 13 | 第二波前端升級規劃 | 完成規格確認、設計一條條連線/飛行減速/Loading優化/按鈕美化計畫並獲得確認 |
 | 14 | 第二波前端升級實作 | 已撤回（黑屏）；恢復交接版 |
-| 15 | Git baseline + loader 修復 | `f34f4ee`、`f7ec76e`；Stake 可玩 |
-| 16 | 版控寫入 skill + 更新交接 | `stake-engine-local-dev`、本文件 §4.10 / §5.6 |
+| 15 | Git baseline + loader 修復 | `42fda6d`、`d0909df`；Stake 可玩 |
+| 16 | 版控寫入 skill + 更新交接 | `stake-engine-local-dev`、§4.10 / §5.6 |
+| 17 | push 至 fork | `git rebase mine/main`；push `mine` → stone8000/math-sdk |
+| 18 | 定稿版控流程 | 每次改動必 commit；本文件 §4.11、skill 更新 |
 
 ---
 

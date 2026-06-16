@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { recordBookEvent, checkIsMultipleRevealEvents, type BookEventHandlerMap } from 'utils-book';
 import { stateBet, stateUi } from 'state-shared';
 import { sequence } from 'utils-shared/sequence';
+import { waitForTimeout } from 'utils-shared/wait';
 
 import { eventEmitter } from './eventEmitter';
 import { playBookEvent } from './utils';
@@ -60,9 +61,23 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 	},
 	winInfo: async (bookEvent: BookEventOfType<'winInfo'>) => {
 		eventEmitter.broadcast({ type: 'soundOnce', name: 'sfx_winlevel_small' });
+
+		// Build win line data for the WinLines component
+		const winLineData = bookEvent.wins.map((win) => ({
+			lineIndex: win.meta.lineIndex,
+			positions: win.positions,
+		}));
+
+		// Draw all lines one by one (staggered inside WinLines component)
+		await eventEmitter.broadcastAsync({ type: 'winLinesShow', wins: winLineData });
+
+		// Animate winning symbols sequentially
 		await sequence(bookEvent.wins, async (win) => {
 			await animateSymbols({ positions: win.positions });
 		});
+
+		// Clear lines after symbol animations complete
+		eventEmitter.broadcast({ type: 'winLinesHide' });
 	},
 	setTotalWin: async (bookEvent: BookEventOfType<'setTotalWin'>) => {
 		stateBet.winBookEventAmount = bookEvent.amount;
@@ -107,12 +122,32 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 		stateUi.freeSpinCounterTotal = bookEvent.total;
 	},
 	updateGlobalMult: async (bookEvent: BookEventOfType<'updateGlobalMult'>) => {
-		stateGame.globalMultiplier = bookEvent.globalMult;
+		const targetMult = bookEvent.globalMult;
+		const currentMult = stateGame.globalMultiplier;
+
 		eventEmitter.broadcast({ type: 'globalMultiplierShow' });
-		await eventEmitter.broadcastAsync({
-			type: 'globalMultiplierUpdate',
-			multiplier: bookEvent.globalMult,
-		});
+
+		if (targetMult > currentMult) {
+			// Animate one-by-one: each Wild adds +1, show each increment individually
+			for (let mult = currentMult + 1; mult <= targetMult; mult++) {
+				stateGame.globalMultiplier = mult;
+				await eventEmitter.broadcastAsync({
+					type: 'globalMultiplierUpdate',
+					multiplier: mult,
+				});
+				// Pause between each increment for dramatic effect (450ms feels right)
+				if (mult < targetMult) {
+					await waitForTimeout(450);
+				}
+			}
+		} else {
+			// Reset or same — just update directly
+			stateGame.globalMultiplier = targetMult;
+			await eventEmitter.broadcastAsync({
+				type: 'globalMultiplierUpdate',
+				multiplier: targetMult,
+			});
+		}
 	},
 	freeSpinRetrigger: async (bookEvent: BookEventOfType<'freeSpinRetrigger'>) => {
 		eventEmitter.broadcast({ type: 'soundOnce', name: 'sfx_scatter_win_v2' });

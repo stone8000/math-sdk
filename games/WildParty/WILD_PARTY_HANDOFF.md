@@ -1,8 +1,8 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-06-14（Git push 至 fork、Stake 可玩確認、版控流程定稿）  
+> 最後更新：2026-06-14（Skill 總覽 `wild-party-skill-guide`、版控定稿）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
-> 對話來源：Cursor 多輪協作（math → 前端 → 上傳修復 → Git 版控 → 遠端備份）
+> **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
 ---
 
@@ -686,23 +686,31 @@ bgm_base (loop), bgm_freegame (loop)
 | 15 | Git baseline + loader 修復 | `42fda6d`、`d0909df`；Stake 可玩 |
 | 16 | 版控寫入 skill + 更新交接 | `stake-engine-local-dev`、§4.10 / §5.6 |
 | 17 | push 至 fork | `git rebase mine/main`；push `mine` → stone8000/math-sdk |
-| 18 | 定稿版控流程 | 每次改動必 commit；本文件 §4.11、skill 更新 |
+| 18 | 定稿版控流程 | 每次改動必 commit；§4.11、skill 更新 |
+| 19 | Skill 總覽 skill | `wild-party-skill-guide`；§12 更新 |
 
 ---
 
 ## 12. 相關 Skill（Cursor）
 
-繼續開發時可 @ 這些 skill：
+**Skill 總覽（該 @ 哪一個？）：** `@wild-party-skill-guide`  
+依任務選 skill 的決策表、常見情境指令、本專案教訓，都寫在該 skill 內。
 
-| Skill | 用途 |
-|-------|------|
-| `stake-engine-local-dev` | 本機 math-sdk / web-sdk 指令與環境 |
-| `stake-engine-casino-development` | 端到端交付總覽 |
-| `stake-game-developer` | math + RGS + 前端播放；**Thumbnail 審核規格**（`game-approval-checklist.md`） |
-| `book-generator` | books / lookup / index 產物 |
-| `senior-game-math-engineer` | RTP、輪帶、模擬 |
-| `pixi-svelte-integrator` | Pixi + Svelte 渲染 |
-| `slot-ui-studio` | UI 架構 |
+繼續開發時建議組合：
+
+| 優先 | Skill | 用途 |
+|------|-------|------|
+| ★ | `wild-party-skill-guide` | **Skill 路由總覽**（不確定時先看） |
+| ★ | `WILD_PARTY_HANDOFF.md` | 專案現況、路徑、坑、上傳 |
+| ★ | `stake-engine-local-dev` | 本機指令、**每次改動必 commit**、push `mine` |
+| | `stake-engine-casino-development` | Stake 端到端交付總覽 |
+| | `stake-game-developer` | RGS、replay、上架檢查、Thumbnail 規格 |
+| | `senior-game-math-engineer` | RTP、輪帶、`game_config.py` |
+| | `book-generator` | books / lookup / index |
+| | `pixi-svelte-integrator` | Pixi + Svelte 渲染與生命週期 |
+| | `slot-ui-studio` | UI 架構、Modals 本地覆寫 |
+| | `event-animation-designer` | 連線／飛行／Loading 動效（先開分支） |
+| | `slot-qa-engineer` | 測試與回歸 |
 
 ---
 

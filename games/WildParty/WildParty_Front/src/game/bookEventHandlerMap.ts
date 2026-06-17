@@ -62,16 +62,17 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 	winInfo: async (bookEvent: BookEventOfType<'winInfo'>) => {
 		eventEmitter.broadcast({ type: 'soundOnce', name: 'sfx_winlevel_small' });
 
-		// Build win line data for the WinLines component
+		// Build win line data — each win has a lineIndex from meta
 		const winLineData = bookEvent.wins.map((win) => ({
 			lineIndex: win.meta.lineIndex,
 			positions: win.positions,
+			symbolCount: win.positions.length,
 		}));
 
-		// Draw all lines one by one (staggered inside WinLines component)
+		// Show all winning lines (drawn one by one with stagger inside WinLines)
 		await eventEmitter.broadcastAsync({ type: 'winLinesShow', wins: winLineData });
 
-		// Animate winning symbols sequentially
+		// Animate winning symbols sequentially after lines are displayed
 		await sequence(bookEvent.wins, async (win) => {
 			await animateSymbols({ positions: win.positions });
 		});
@@ -128,16 +129,16 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 		eventEmitter.broadcast({ type: 'globalMultiplierShow' });
 
 		if (targetMult > currentMult) {
-			// Animate one-by-one: each Wild adds +1, show each increment individually
+			// Animate one-by-one: each Wild adds +1, show each increment with dramatic pacing
 			for (let mult = currentMult + 1; mult <= targetMult; mult++) {
 				stateGame.globalMultiplier = mult;
 				await eventEmitter.broadcastAsync({
 					type: 'globalMultiplierUpdate',
 					multiplier: mult,
 				});
-				// Pause between each increment for dramatic effect (450ms feels right)
+				// Longer pause between each increment for satisfying build-up (700ms)
 				if (mult < targetMult) {
-					await waitForTimeout(450);
+					await waitForTimeout(700);
 				}
 			}
 		} else {

@@ -42,103 +42,108 @@
 		}
 	}
 
-	/* Wild Party premium button styling */
-	:global(.ui-button),
-	:global(button[class*='btn']),
-	:global(.modal button),
-	:global(.modal-content button) {
-		position: relative;
-		border: 1px solid rgba(255, 0, 255, 0.3) !important;
+	/* ═══════════════════════════════════════════════════════
+	   Wild Party — Premium Button & Modal Styling
+	   Targets the actual shared component class names:
+	   - .button (components-shared/Button.svelte)
+	   - .rectangle (components-ui-html/BaseIcon.svelte)
+	   - .pop-up-wrap (components-shared/Popup.svelte)
+	   - .close-button (components-shared/Popup.svelte)
+	   ═══════════════════════════════════════════════════════ */
+
+	/* Button icon background (the black rounded rectangle inside buttons) */
+	:global(.rectangle) {
 		background: linear-gradient(
-			135deg,
-			rgba(20, 0, 40, 0.9) 0%,
-			rgba(40, 0, 60, 0.9) 50%,
-			rgba(20, 0, 40, 0.9) 100%
+			160deg,
+			rgba(30, 5, 50, 0.95) 0%,
+			rgba(15, 2, 30, 0.98) 40%,
+			rgba(25, 5, 45, 0.95) 100%
 		) !important;
+		border: 1px solid rgba(200, 100, 255, 0.35) !important;
+		border-radius: 10px !important;
+		box-shadow:
+			0 2px 10px rgba(180, 50, 255, 0.15),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+		transition: all 0.2s ease !important;
+	}
+
+	/* Button wrapper hover/active states */
+	:global(.button:hover .rectangle) {
+		border-color: rgba(220, 120, 255, 0.6) !important;
+		box-shadow:
+			0 4px 18px rgba(200, 80, 255, 0.25),
+			inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+	}
+
+	:global(.button:active .rectangle) {
+		border-color: rgba(255, 150, 255, 0.7) !important;
+		box-shadow:
+			0 1px 6px rgba(200, 80, 255, 0.3),
+			inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+		transform: scale(0.97);
+	}
+
+	/* Close button (×) */
+	:global(.close-button) {
+		color: rgba(200, 150, 255, 0.8) !important;
+		transition: color 0.2s ease, text-shadow 0.2s ease !important;
+	}
+
+	:global(.close-button:hover) {
 		color: #fff !important;
-		border-radius: 8px !important;
-		font-weight: 600 !important;
-		letter-spacing: 0.5px;
-		transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-		box-shadow:
-			0 2px 8px rgba(255, 0, 255, 0.15),
-			inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-		text-transform: uppercase;
-		backdrop-filter: blur(4px);
+		text-shadow: 0 0 12px rgba(255, 100, 255, 0.8) !important;
 	}
 
-	:global(.ui-button:hover),
-	:global(button[class*='btn']:hover),
-	:global(.modal button:hover),
-	:global(.modal-content button:hover) {
-		border-color: rgba(255, 0, 255, 0.6) !important;
-		box-shadow:
-			0 4px 16px rgba(255, 0, 255, 0.3),
-			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-		transform: translateY(-1px);
+	/* Modal backdrop blur layer */
+	:global(.blur-layer) {
+		background-color: rgba(5, 0, 15, 0.7) !important;
 	}
 
-	:global(.ui-button:active),
-	:global(button[class*='btn']:active),
-	:global(.modal button:active),
-	:global(.modal-content button:active) {
-		transform: translateY(0px);
-		box-shadow:
-			0 1px 4px rgba(255, 0, 255, 0.2),
-			inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-	}
-
-	/* Modal styling upgrade */
-	:global(.modal-content),
-	:global([class*='modal-body']),
-	:global([class*='ModalContent']) {
+	/* Content wrapper in modals */
+	:global(.ui-popup-standard-content-wrap) {
 		background: linear-gradient(
 			180deg,
-			rgba(15, 0, 30, 0.97) 0%,
-			rgba(10, 0, 20, 0.98) 100%
+			rgba(18, 4, 35, 0.96) 0%,
+			rgba(10, 2, 22, 0.98) 100%
 		) !important;
-		border: 1px solid rgba(255, 0, 255, 0.2) !important;
-		border-radius: 12px !important;
+		border: 1px solid rgba(180, 80, 255, 0.2) !important;
+		border-radius: 14px !important;
+		padding: 1.5rem !important;
 		box-shadow:
-			0 8px 32px rgba(0, 0, 0, 0.6),
-			0 0 60px rgba(255, 0, 255, 0.08) !important;
-		backdrop-filter: blur(12px);
+			0 12px 40px rgba(0, 0, 0, 0.7),
+			0 0 80px rgba(150, 50, 255, 0.06) !important;
 	}
 
 	/* Scrollbar premium styling */
 	:global(::-webkit-scrollbar) {
-		width: 6px;
+		width: 5px;
 	}
 	:global(::-webkit-scrollbar-track) {
-		background: rgba(10, 0, 20, 0.5);
+		background: rgba(10, 0, 20, 0.4);
 		border-radius: 3px;
 	}
 	:global(::-webkit-scrollbar-thumb) {
-		background: linear-gradient(180deg, rgba(255, 0, 255, 0.4), rgba(100, 0, 200, 0.4));
+		background: linear-gradient(180deg, rgba(180, 80, 255, 0.4), rgba(100, 30, 180, 0.4));
 		border-radius: 3px;
 	}
 	:global(::-webkit-scrollbar-thumb:hover) {
-		background: linear-gradient(180deg, rgba(255, 0, 255, 0.6), rgba(100, 0, 200, 0.6));
+		background: linear-gradient(180deg, rgba(200, 100, 255, 0.6), rgba(120, 50, 200, 0.6));
 	}
 
-	/* Select / input premium styling */
-	:global(.modal select),
-	:global(.modal input),
-	:global(.modal-content select),
-	:global(.modal-content input) {
-		background: rgba(20, 0, 40, 0.8) !important;
-		border: 1px solid rgba(255, 0, 255, 0.2) !important;
+	/* Toggle / checkbox inputs in modals */
+	:global(.pop-up-wrap input),
+	:global(.pop-up-wrap select) {
+		background: rgba(20, 5, 40, 0.8) !important;
+		border: 1px solid rgba(180, 80, 255, 0.25) !important;
 		border-radius: 6px !important;
 		color: #fff !important;
 		transition: border-color 0.2s ease !important;
 	}
 
-	:global(.modal select:focus),
-	:global(.modal input:focus),
-	:global(.modal-content select:focus),
-	:global(.modal-content input:focus) {
-		border-color: rgba(255, 0, 255, 0.5) !important;
+	:global(.pop-up-wrap input:focus),
+	:global(.pop-up-wrap select:focus) {
+		border-color: rgba(200, 100, 255, 0.5) !important;
 		outline: none !important;
-		box-shadow: 0 0 8px rgba(255, 0, 255, 0.2) !important;
+		box-shadow: 0 0 8px rgba(180, 80, 255, 0.2) !important;
 	}
 </style>

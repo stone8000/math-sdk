@@ -275,6 +275,69 @@ games/WildParty/
 
 > 若日後重做 UI 升級，**先開 git 分支**，每步 `pnpm build` + 本機／Stake 測試後再 commit。
 
+### 4.12 第三波前端升級（2026-06-17）— feature 分支
+
+**分支：** `feature/front-v2-winlines-loading-buttons`（基於 `83f6ee2` main）
+
+本次吸取第二波教訓：先開分支、每步 build 確認、不動 `+layout.svelte` loader 流程。
+
+#### WinLines 連線動畫（已完成）
+
+- [x] `WinLines.svelte`：新元件，中獎時畫出完整 payline 路徑
+  - 使用 `config.paylines` 定義，每條線穿過全部 5 reel（不只 winning positions）
+  - 多層 glow 渲染：8px 外光 → 5px 中光 → 2.5px 核心 → 1px 白色高光
+  - 35 色霓虹色盤，一條一條依序出現（500ms stagger），全顯後 hold 800ms
+  - 先畫線 → 再跑符號 win 動畫 → 最後清線
+- [x] `typesEmitterEvent.ts`：新增 `EmitterEventWinLines` 類型
+- [x] `bookEventHandlerMap.ts`：`winInfo` 事件觸發 `winLinesShow` → 動畫 → `winLinesHide`
+- [x] `Game.svelte`：接入 `<WinLines />`
+
+#### Global Multiplier 一顆一顆打（已完成）
+
+- [x] `bookEventHandlerMap.ts`：`updateGlobalMult` 改為逐一 +1 遞增
+  - 每次 +1 觸發 Spine `increment` 動畫 + 音效
+  - 間隔 **700ms**，節奏緩慢有戲劇感
+  - 重置（回 1）仍走 `reset` 動畫一次完成
+
+#### Loading Screen 品牌化（已完成）
+
+- [x] `LoadingScreen.svelte`：替換範本 Spine loader 畫面
+  - 暗色背景 + 「WILD PARTY」霓虹大標題 + 副標
+  - 細長紫色進度條（動態 animatedProgress）
+  - **保留 `+layout.svelte` 的 `LoaderStakeEngine` / `LoaderExample` GIF 不動**（避免黑屏）
+  - PressToContinue + TransitionAnimation 流程不變
+
+#### 按鈕與 Modal 高級感 CSS（已完成）
+
+- [x] `Modals.svelte` 全域 CSS 覆寫：
+  - `.rectangle`（BaseIcon）：深紫漸層 + 霓虹邊框 + glow 陰影
+  - `.button:hover .rectangle`：增亮邊框 + 加深 glow
+  - `.button:active .rectangle`：內凹效果
+  - `.ui-popup-standard-content-wrap`：深紫毛玻璃面板 + 圓角
+  - `.close-button`：紫色 glow hover 效果
+  - scrollbar / input / select 統一深色紫邊風格
+
+#### 穩定性保證
+
+- `+layout.svelte` **完全未動**（LoaderStakeEngine + LoaderExample + `${base}/` 路徑）
+- `vite.config.js` **完全未動**（`base: './'`）
+- `pnpm build` 成功、`build/` 含所有必要檔案
+- Pixi 渲染管線無改動（符號、背景、Board、Spine preload 不變）
+
+#### Commits
+
+| Commit | 說明 |
+|--------|------|
+| `2a161e7` | 初版：WinLines + Loading + CSS + GlobalMult 450ms |
+| `019ee36` | 修正：payline完整路徑、CSS對準實際class、乘倍700ms |
+
+#### Merge 回 main 前
+
+1. 本機 `pnpm dev` 確認連線/乘倍/Loading/按鈕視覺正常
+2. 上傳 `build/` 到 Stake 後台 → Play Game 確認不黑屏
+3. `git checkout main && git merge feature/front-v2-winlines-loading-buttons`
+4. `git push mine main`
+
 ### 4.10 上傳黑屏修復（2026-06-13）— 目前可玩版
 
 **症狀：** Stake 後台 Play Game 全黑，中央破圖 `loader`。

@@ -9,6 +9,8 @@
 	const lineCount = Object.keys(config.paylines).length;
 	const maxWin = config.betModes?.base?.max_win ?? 5000;
 	const buyCost = config.betModes?.bonus?.cost;
+	const reelCount = config.numReels;
+	const rowCount = config.numRows?.[0] ?? 3;
 </script>
 
 {#if stateModal.modal?.name === 'gameRules'}
@@ -19,40 +21,73 @@
 			<section class="wp-card">
 				<h3><span class="wp-accent-bar"></span>How to play</h3>
 				<p>
-					Wild Party is a {config.numReels}&times;3 video slot with {lineCount} fixed paylines.
-					Line wins pay left to right from the leftmost reel on adjacent reels. Only the
-					highest win per line is paid. Theoretical RTP is {rtpPct}.
+					Wild Party is a {reelCount}&times;{rowCount} video slot with {lineCount} fixed paylines.
+					Winning combinations pay left to right, starting from the leftmost reel on
+					adjacent reels. Only the highest win is paid per line, and all line wins are added
+					together. The theoretical return to player (RTP) is {rtpPct}.
 				</p>
 			</section>
 
 			<section class="wp-card">
 				<h3><span class="wp-accent-bar"></span>Wild</h3>
-				<p>The Wild symbol substitutes for all symbols except the Scatter to help complete winning lines.</p>
+				<p>
+					The Wild symbol substitutes for every symbol except the Scatter, helping to
+					complete winning paylines. Wilds also drive the Global Multiplier during Free Spins.
+				</p>
 			</section>
 
 			<section class="wp-card">
-				<h3><span class="wp-accent-bar"></span>Scatter &amp; Free Spins</h3>
+				<h3><span class="wp-accent-bar"></span>Scatter</h3>
 				<p>
-					Landing 3 or more Scatter symbols anywhere awards the Free Spins feature. During Free
-					Spins a Global Multiplier grows as the feature progresses and is applied to your wins.
-					Additional Scatters during the feature retrigger more Free Spins.
+					The Scatter symbol appears only on reels 3, 4 and 5. Scatters pay anywhere on the
+					reels and do not need to be on a payline. Landing 3 Scatters in a single spin
+					triggers the Free Spins feature.
+				</p>
+			</section>
+
+			<section class="wp-card">
+				<h3><span class="wp-accent-bar"></span>Free Spins</h3>
+				<p>
+					3 Scatters award 5 Free Spins. Landing another 3 Scatters during the feature
+					retriggers and adds +5 Free Spins. The feature is played on a dedicated reel set
+					with more Wilds.
+				</p>
+			</section>
+
+			<section class="wp-card">
+				<h3><span class="wp-accent-bar"></span>Global Multiplier</h3>
+				<p>
+					Free Spins use a single accumulating Global Multiplier applied to every line win.
+					It starts between 1&times; and 3&times; (based on the lines the triggering Scatters
+					land on) and increases by +1 for every Wild that appears during Free Spins, up to a
+					maximum of 100&times;. The multiplier stays active for the whole feature.
 				</p>
 			</section>
 
 			{#if buyCost}
 				<section class="wp-card">
 					<h3><span class="wp-accent-bar"></span>Buy Bonus</h3>
-					<p>You can buy direct entry into the Free Spins feature for {buyCost}&times; your total bet.</p>
+					<p>
+						Instead of waiting for Scatters, you can buy direct entry into the Free Spins
+						feature for {buyCost}&times; your total bet. The Buy Bonus plays at the same {rtpPct} RTP.
+					</p>
 				</section>
 			{/if}
 
 			<section class="wp-card">
 				<h3><span class="wp-accent-bar"></span>Max Win</h3>
-				<p>The maximum payout is capped at {maxWin.toLocaleString()}&times; the total bet. Once reached, the round ends and the win is awarded.</p>
+				<p>
+					The maximum payout is capped at {maxWin.toLocaleString()}&times; the total bet. Once
+					the cap is reached the round ends immediately and the maximum win is awarded.
+				</p>
 			</section>
 
 			<div class="wp-divider"></div>
-			<p class="wp-foot">Malfunction voids all pays and plays. Game outcome is determined at spin time by the remote game server.</p>
+			<p class="wp-foot">
+				Malfunction voids all pays and plays. A stable internet connection is required; if a
+				round is interrupted, reload the game to complete it. Reel movement is illustrative only
+				&mdash; every outcome is determined at spin time by the remote game server.
+			</p>
 		</div>
 	</Popup>
 {/if}
@@ -91,12 +126,19 @@
 	}
 
 	.wp-rules {
+		/* sit above the Popup's full-screen click-to-close layer (z-index 2),
+		   otherwise the overlay swallows wheel/touch events and blocks scrolling */
+		position: relative;
+		z-index: 100;
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
+		width: min(36rem, 90vw);
 		max-width: 36rem;
 		max-height: 80vh;
 		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
 		padding: 1.5rem 1.75rem;
 		color: #fff;
 		text-align: left;
@@ -146,6 +188,9 @@
 		&:nth-child(4) { animation-delay: 0.15s; }
 		&:nth-child(5) { animation-delay: 0.2s; }
 		&:nth-child(6) { animation-delay: 0.25s; }
+		&:nth-child(7) { animation-delay: 0.3s; }
+		&:nth-child(8) { animation-delay: 0.35s; }
+		&:nth-child(9) { animation-delay: 0.4s; }
 
 		&:hover {
 			background: rgba(255, 122, 217, 0.05);

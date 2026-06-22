@@ -37,6 +37,8 @@
 	// keep high -> low ordering for readability
 	const ORDER = ['W', 'H1', 'H2', 'H3', 'H4', 'L1', 'L2', 'L3', 'L4', 'S'];
 
+	const maxWin = config.betModes?.base?.max_win ?? 5000;
+
 	const imgSrc = (name: string) => {
 		const key = SYMBOL_ASSET[name];
 		const asset = key ? (assets[key] as { src?: string } | undefined) : undefined;
@@ -74,7 +76,7 @@
 						</div>
 						<div class="wp-pays">
 							{#if row.name === 'S'}
-								<span class="wp-special">3+ Scatters trigger Free Spins</span>
+								<span class="wp-special">3 Scatters (reels 3-5) trigger 5 Free Spins</span>
 							{:else if row.pays.length}
 								{#each row.pays as pay (pay.count)}
 									<span class="wp-pay-chip"><b>{pay.count}</b> &times; <em>{pay.value}</em></span>
@@ -85,7 +87,7 @@
 				{/each}
 			</div>
 
-			<p class="wp-note">Wild substitutes for all symbols except Scatter. Max win is capped at 5,000&times; total bet.</p>
+			<p class="wp-note">Wild substitutes for all symbols except Scatter. Max win is capped at {maxWin.toLocaleString()}&times; total bet.</p>
 		</div>
 	</Popup>
 {/if}
@@ -120,12 +122,19 @@
 	}
 
 	.wp-paytable {
+		/* sit above the Popup's full-screen click-to-close layer (z-index 2),
+		   otherwise the overlay swallows wheel/touch events and blocks scrolling */
+		position: relative;
+		z-index: 100;
 		display: flex;
 		flex-direction: column;
 		gap: 0.85rem;
+		width: min(36rem, 90vw);
 		max-width: 36rem;
 		max-height: 80vh;
 		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
 		padding: 1.5rem 1.75rem;
 		color: #fff;
 		text-align: center;

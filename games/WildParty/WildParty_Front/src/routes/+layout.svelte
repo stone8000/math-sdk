@@ -2,8 +2,9 @@
 	import { type Snippet } from 'svelte';
 	import { base } from '$app/paths';
 	import { GlobalStyle } from 'components-ui-html';
-	import { Authenticate, LoaderStakeEngine, LoaderExample, LoadI18n } from 'components-shared';
+	import { Authenticate, LoaderStakeEngine, LoadI18n } from 'components-shared';
 	import Game from '../components/Game.svelte';
+	import WildPartyLoader from '../components/WildPartyLoader.svelte';
 	import { setContext } from '../game/context';
 
 	import messagesMap from '../i18n/messagesMap';
@@ -16,7 +17,6 @@
 
 	// static/*.gif — must use kit base path (Stake hosts games under a subpath, not site root)
 	const loaderUrlStakeEngine = `${base}/stake-engine-loader.gif`;
-	const loaderUrl = `${base}/loader.gif`;
 
 	setContext();
 </script>
@@ -32,7 +32,7 @@
 <LoaderStakeEngine src={loaderUrlStakeEngine} oncomplete={() => (showYourLoader = true)} />
 
 {#if showYourLoader}
-	<LoaderExample src={loaderUrl} />
+	<WildPartyLoader />
 {/if}
 
 {@render props.children()}

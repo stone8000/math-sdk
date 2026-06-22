@@ -338,6 +338,40 @@ games/WildParty/
 3. `git checkout main && git merge feature/front-v2-winlines-loading-buttons`
 4. `git push mine main`
 
+### 4.13 第四波修正（2026-06-22）— buy bonus / info 頁 / loader（同 feature 分支）
+
+延續 `feature/front-v2-winlines-loading-buttons` 分支。三個獨立修正：
+
+#### Buy Bonus 只留 100x（commit `aa5c393`）
+
+- **症狀：** buy bonus 畫面出現多個購買選項（ANTE / SUPER ANTE / SUPER SPIN / SUPER BONUS 200x…），但只有 **100x BONUS** 能正常遊玩，其餘點了無法進場。
+- **根因：** 共享庫 `state-shared/src/constants.ts` 的 `DEFAULT_BET_MODE_META` 是「範本」預設，內含 6 個模式；`Authenticate.svelte` **不會**從 RGS 回寫 `betModeMeta`，所以 buy bonus 永遠顯示這 6 個範本模式。但 Wild Party math 只產 `base` + `bonus(100x)` 兩種模式 → 其他模式無對應 math。
+- **修復：** 新增 `src/game/betModeMeta.ts`（`WILD_PARTY_BET_MODE_META` 只含 `BASE` + `BONUS` 100x，cost 取自 `config.betModes`），在 `src/game/context.ts` 的 `setContext()` 設 `stateMeta.betModeMeta = WILD_PARTY_BET_MODE_META`。**不改共享庫**（避免影響其他遊戲）。
+- 之後若 math 新增模式（如真的做 ANTE / SUPER），需同步更新此 override。
+
+#### Info 頁可滾動 + 補完內容（commit `7a59929`）
+
+- **症狀：** GameRules / PayTable（info 頁）內容看起來不完整，且**無法下拉滾動**。
+- **根因（滾動）：** 共享 `Popup.svelte` 內有一層全螢幕 `.click-to-close-layer`（`position:absolute; z-index:2`）。我們本地的 `.wp-rules` / `.wp-paytable` 是 `.top-layer` 的 flex 子項但**沒設 z-index**，被關閉層蓋住 → 滾輪/觸控事件被攔截、且點內容會誤觸關閉。共享 modal 用的 `BaseContent` 是靠 `z-index:100` 浮起（flex 子項即使 static 也吃 z-index）。
+- **修復（滾動）：** 兩個容器加 `position:relative; z-index:100`，並加 `-webkit-overflow-scrolling:touch; overscroll-behavior:contain`，寬度改 `min(36rem, 90vw)`。
+- **修復（內容）：** 依 `game_config.py` 補正規則：5×3 / 35 線、Scatter 僅出現於第 3-5 軸、3 Scatter → 5 次免費遊戲、retrigger +5、全域倍數 1-3 起始每顆 Wild +1 上限 100x、Buy Bonus 100x、max win 動態取自 config。
+- 已比對符號美術，PayTable 標籤正確：H1=Disco Ball、H2=Champagne、H3=Cocktail、H4=Gift（與 `static/assets/sprites/wildPartySymbols/*.png` 一致）。
+
+#### 簡單的 Wild Party Loader（commit `b667754`）
+
+- **症狀：** 「好像還沒有 loader」。
+- **根因：** `+layout.svelte` 中間那層用的是 web-sdk 範本元件 `LoaderExample`，會顯示「**Add Your Loader**」佔位字樣 → 等同沒有真正 loader。
+- **修復：** 新增 `src/components/WildPartyLoader.svelte`（純 CSS：深色漸層底 + 旋轉圈 + 「WILD PARTY」漸層標題 +「LOADING…」，顯示約 1.6s 後淡出，**不依賴 gif**），在 `+layout.svelte` 取代 `LoaderExample`，並移除不再需要的 `loader.gif` 引用。
+- **保留：** `LoaderStakeEngine`（Stake 品牌開場）、Pixi `LoadingScreen`（進度條主畫面）。載入順序：Stake 品牌 → Wild Party CSS loader → Pixi 載入畫面。
+
+#### Commits
+
+| Commit | 說明 |
+|--------|------|
+| `aa5c393` | buy bonus 只保留 100x BONUS（betModeMeta override） |
+| `7a59929` | info 頁可滾動 + 規則/賠付內容補完 |
+| `b667754` | 簡單的 Wild Party CSS loader 取代範本佔位 |
+
 ### 4.10 上傳黑屏修復（2026-06-13）— 目前可玩版
 
 **症狀：** Stake 後台 Play Game 全黑，中央破圖 `loader`。
@@ -689,6 +723,11 @@ pnpm build
 | `pnpm build \| tail` 看似卡住 | esbuild 子進程；看 `build/` 時間戳或寫 log 檔；手動 kill 卡住的 build 進程 |
 | 滾動中與靜止中的 rows 座標映射有 offset | 使用 book 事件帶來的 `win.positions` 進行直接映射，不額外依賴 row 偏移 |
 | 前端 framework 預載的 Spine 資源 `loader` 導致 Loading 頁卡住 | 維持範本 Spine LoadingScreen；勿在未測子路徑部署前改 Loader 流程 |
+| **vite build「卡住」/ 背景任務 aborted，build 其實完成** | vite 跑完（`built in Xs` + `Wrote site to "build"`）後 node 程序常**不自動退出**；舊 session 殘留的 build 程序會堆積、互相搶 `rm -rf build` 而全卡死。判斷成功看 log 的 `Wrote site to` 與 `build/index.html` 時間戳；用 `node node_modules/vite/bin/vite.js build > log 2>&1` 並在完成後 kill 殘留程序 |
+| `pkill -f "vite.js build"` 把自己殺掉 | 該 pattern 會匹配到正在執行此指令的 shell（cmdline 含同字串）→ 整條指令被殺、exit 1。改用更精確 pattern（含完整路徑）或先 `pgrep -lf` 確認 |
+| **buy bonus 出現無法遊玩的多餘選項** | 共享 `DEFAULT_BET_MODE_META` 範本含 6 模式且 `Authenticate` 不回寫；在遊戲端覆寫 `stateMeta.betModeMeta`（見 §4.13、`src/game/betModeMeta.ts`） |
+| **本地 modal（PayTable/Rules）無法滾動、點內容會關閉** | 共享 `Popup` 的 `.click-to-close-layer`（z-index:2）蓋住內容；本地內容容器需 `position:relative; z-index:100`（見 §4.13） |
+| info 頁顯示「Add Your Loader」/ 感覺沒 loader | 那是 web-sdk 範本 `LoaderExample` 佔位；用本地 `WildPartyLoader.svelte` 取代（見 §4.13） |
 
 ---
 
@@ -751,6 +790,29 @@ bgm_base (loop), bgm_freegame (loop)
 | 17 | push 至 fork | `git rebase mine/main`；push `mine` → stone8000/math-sdk |
 | 18 | 定稿版控流程 | 每次改動必 commit；§4.11、skill 更新 |
 | 19 | Skill 總覽 skill | `wild-party-skill-guide`；§12 更新 |
+| 20 | 同步 skills 到 Slot-Casino 資料夾 | 新增/更新 `wild-party-skill-guide`、`stake-engine-local-dev`、`stake-engine-casino-development`、`stake-game-developer` |
+| 21 | buy bonus 只留 100x | `betModeMeta.ts` override；§4.13、`aa5c393` |
+| 22 | info 頁可滾動 + 補完內容 | Popup z-index 修復 + 規則補完；§4.13、`7a59929` |
+| 23 | 簡單 loader | `WildPartyLoader.svelte`；§4.13、`b667754` |
+| 24 | 送審 Game Details + 寫入交接 | §14 介紹文、§4.13、§9 踩坑 |
+
+---
+
+## 14. 送審用 Game Details（Stake 後台「GAME DETAILS」欄位）
+
+> 用途：Stake 後台送審表單的 **GAME DETAILS** 欄位（要求描述 features / gameplay mechanics，最少 20 字）。直接複製下方英文段落貼上。
+
+```text
+Wild Party is a 5x3, 35-payline video slot with a 96% RTP and a maximum win of 5,000x the total bet.
+
+Base game: Winning combinations pay left-to-right on adjacent reels, starting from the leftmost reel. Only the highest win is paid per line and all line wins are added together. The Wild symbol substitutes for every symbol except the Scatter.
+
+Free Spins: The Scatter appears only on reels 3, 4 and 5 and pays anywhere on the reels. Landing 3 Scatters in a single spin triggers 5 Free Spins. During Free Spins a single accumulating Global Multiplier is applied to every line win: it starts between 1x and 3x (based on the lines the triggering Scatters land on) and increases by +1 for each Wild that appears during the feature, up to a maximum of 100x. Landing 3 more Scatters during the feature retriggers an additional 5 Free Spins.
+
+Buy Bonus: Players can purchase direct entry into the Free Spins feature for 100x the total bet, played at the same 96% RTP.
+
+Technical: The game runs on the Stake Engine math-sdk with deterministic, server-driven event playback and a PixiJS + Svelte frontend. It supports replay mode and a stateless frontend (payouts are taken from RGS events, never recalculated client-side).
+```
 
 ---
 

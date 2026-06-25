@@ -324,12 +324,33 @@ games/WildParty/
 - `pnpm build` 成功、`build/` 含所有必要檔案
 - Pixi 渲染管線無改動（符號、背景、Board、Spine preload 不變）
 
+#### web-sdk UiSprite 修改（按鈕外觀）
+
+**檔案：** `~/Stake_Engine/web-sdk/packages/components-ui-pixi/src/components/UiSprite.svelte`
+
+由原始的黑色 `Rectangle borderRadius={50}` 改為：
+- `backgroundColor: 0x1a0033`（深紫）
+- `borderWidth: 1.5`
+- `borderColor: 0x8833cc`（紫色邊框）
+- `borderRadius: 12`
+
+> ⚠️ 此修改位於 web-sdk（symlink target），會影響所有使用同一 web-sdk 的專案。若日後需要還原：恢復為 `<Rectangle borderRadius={50} {...props} />`。
+
+#### 自定義 BGM
+
+- `static/assets/audio/background.mp3`：base game 循環播放
+- `Sound.svelte`：用 HTMLAudioElement 獨立播放（不走 sprite 系統）
+- 免費遊戲切回 sprite 系統的 `bgm_freespin`
+- 回到 base 自動恢復 `background.mp3`
+
 #### Commits
 
 | Commit | 說明 |
 |--------|------|
 | `2a161e7` | 初版：WinLines + Loading + CSS + GlobalMult 450ms |
 | `019ee36` | 修正：payline完整路徑、CSS對準實際class、乘倍700ms |
+| `d4cdfcd` | 接入自定義BGM (background.mp3) |
+| `866582f` | 品質提升：UI按鈕紫色邊框、符號放大、Loading背景圖、Buy Bonus描述 |
 
 #### Merge 回 main 前
 

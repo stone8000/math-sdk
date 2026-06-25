@@ -125,9 +125,9 @@ export const HIGH_SYMBOLS = ['H1', 'H2', 'H3', 'H4'];
 
 export const INITIAL_SYMBOL_STATE: SymbolState = 'static';
 
-const HIGH_SYMBOL_SIZE = 0.9;
-const LOW_SYMBOL_SIZE = 0.9;
-const SPECIAL_SYMBOL_SIZE = 1;
+const HIGH_SYMBOL_SIZE = 0.95;
+const LOW_SYMBOL_SIZE = 0.85;
+const SPECIAL_SYMBOL_SIZE = 1.05;
 
 const SPIN_OPTIONS_SHARED = {
 	reelBounceBackSpeed: 0.15,
@@ -175,7 +175,7 @@ const HIGH_RATIOS = { width: HIGH_SYMBOL_SIZE, height: HIGH_SYMBOL_SIZE };
 const LOW_RATIOS = { width: LOW_SYMBOL_SIZE, height: LOW_SYMBOL_SIZE };
 const SPECIAL_RATIOS = { width: SPECIAL_SYMBOL_SIZE, height: SPECIAL_SYMBOL_SIZE };
 // slight "pop" on win so the matched symbols read clearly without a spine
-const WIN_BOOST = 1.12;
+const WIN_BOOST = 1.2;
 
 const symbolSprite = (assetKey: string, ratios: { width: number; height: number }) => ({
 	type: 'sprite' as const,

@@ -45,9 +45,9 @@ export const WILD_PARTY_BET_MODE_META: Record<string, BetModeData> = {
 		text: {
 			title: 'BUY FREE SPINS',
 			dialog:
-				'Triggers the FREE SPINS feature when purchased for 100x the player bet amount. A Global Multiplier builds throughout FREE SPINS and is applied to winning lines.',
-			description: 'Instantly trigger FREE SPINS with a building Global Multiplier.',
-			button: 'BUY',
+				'Purchase instant access to FREE SPINS for 100× your bet. A Global Multiplier starts at 1–3× and grows +1 for every Wild that lands. The multiplier applies to ALL winning lines during the feature. Maximum win: 5,000× your bet.',
+			description: '100× BET → Instant FREE SPINS with building Global Multiplier (up to 100×)',
+			button: 'BUY 100×',
 			tickerIdle: 'PLACE YOUR BET',
 			tickerSpin: 'BONUS BUY ACTIVATED',
 			bannerText: '',

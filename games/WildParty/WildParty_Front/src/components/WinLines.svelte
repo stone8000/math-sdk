@@ -22,7 +22,10 @@
 
 	const context = getContext();
 
-	// Neon colour palette
+	// Visible row indices in the padded board array (top-pad=0, visible=1,2,3, bottom-pad=4)
+	const VISIBLE_ROW_MIN = 1;
+	const VISIBLE_ROW_MAX = 3;
+
 	const LINE_COLORS = [
 		0xff2288, 0x00eeff, 0xffee00, 0xff6600, 0x00ff88,
 		0xcc44ff, 0x44aaff, 0xffaa00, 0xff44aa, 0x22ffcc,
@@ -49,8 +52,17 @@
 	let highlightBoxes = $state<HighlightBox[]>([]);
 	let show = $state(false);
 
-	function getSymbolCenter(reel: number, row: number) {
-		return { x: (reel + 0.5) * SYMBOL_SIZE, y: (row + 0.5) * SYMBOL_SIZE };
+	// Payline values (0,1,2) → board coordinate Y.
+	// Paylines use 0=top, 1=mid, 2=bottom of the visible area.
+	// Board array has padding: visible rows are at array indices 1,2,3.
+	// Symbol Y in board coords = (arrayIndex + 0.5) * SYMBOL_SIZE
+	// So payline row 0 → array index 1 → Y center = 1.5 * SYMBOL_SIZE
+	function paylineRowToY(paylineRow: number) {
+		return (paylineRow + 1 + 0.5) * SYMBOL_SIZE;
+	}
+
+	function paylineRowToX(reel: number) {
+		return (reel + 0.5) * SYMBOL_SIZE;
 	}
 
 	context.eventEmitter.subscribeOnMount({
@@ -59,7 +71,6 @@
 			highlightBoxes = [];
 			show = true;
 
-			// Build all line data
 			const allLines: DrawnLine[] = [];
 			const allBoxes: HighlightBox[] = [];
 
@@ -67,47 +78,50 @@
 				const lineIdx = win.lineIndex;
 				const color = LINE_COLORS[(lineIdx - 1) % LINE_COLORS.length];
 
-				// Full payline path
+				// Full payline path using config definition
 				const paylineRows: number[] =
 					(config.paylines as Record<string, number[]>)[String(lineIdx)];
 				if (!paylineRows) continue;
 
 				const points: { x: number; y: number }[] = [];
 				for (let reel = 0; reel < paylineRows.length; reel++) {
-					points.push(getSymbolCenter(reel, paylineRows[reel]));
+					points.push({ x: paylineRowToX(reel), y: paylineRowToY(paylineRows[reel]) });
 				}
 				allLines.push({ lineIndex: lineIdx, color, points });
 
-				// Highlight boxes on winning positions
+				// Highlight boxes ONLY on visible winning positions
 				for (const pos of win.positions) {
-					allBoxes.push({
-						x: pos.reel * SYMBOL_SIZE,
-						y: pos.row * SYMBOL_SIZE,
-						color,
-					});
+					if (pos.row >= VISIBLE_ROW_MIN && pos.row <= VISIBLE_ROW_MAX) {
+						allBoxes.push({
+							x: pos.reel * SYMBOL_SIZE,
+							y: pos.row * SYMBOL_SIZE,
+							color,
+						});
+					}
 				}
 			}
 
 			if (fast) {
-				// Free game mode: show all lines + boxes at once, brief hold
+				// Free game: all at once, quick hold
 				drawnLines = allLines;
 				highlightBoxes = allBoxes;
-				await waitForTimeout(400);
+				await waitForTimeout(350);
 			} else {
-				// Base game: stagger lines one by one
+				// Base game: stagger
 				for (let i = 0; i < allLines.length; i++) {
 					drawnLines = [...drawnLines, allLines[i]];
-					// Add boxes for this line's win
 					const win = wins[i];
 					for (const pos of win.positions) {
-						const color = LINE_COLORS[(win.lineIndex - 1) % LINE_COLORS.length];
-						highlightBoxes = [...highlightBoxes, { x: pos.reel * SYMBOL_SIZE, y: pos.row * SYMBOL_SIZE, color }];
+						if (pos.row >= VISIBLE_ROW_MIN && pos.row <= VISIBLE_ROW_MAX) {
+							const color = LINE_COLORS[(win.lineIndex - 1) % LINE_COLORS.length];
+							highlightBoxes = [...highlightBoxes, { x: pos.reel * SYMBOL_SIZE, y: pos.row * SYMBOL_SIZE, color }];
+						}
 					}
 					if (i < allLines.length - 1) {
 						await waitForTimeout(400);
 					}
 				}
-				await waitForTimeout(600);
+				await waitForTimeout(500);
 			}
 		},
 		winLinesHide: () => {
@@ -125,41 +139,37 @@
 {#if show && (drawnLines.length > 0 || highlightBoxes.length > 0)}
 	<BoardContainer>
 		<Container zIndex={10}>
-			<!-- Payline paths -->
 			{#each drawnLines as line (line.lineIndex)}
 				<Graphics
 					draw={(g) => {
 						if (!line.points || line.points.length < 2) return;
 						g.clear();
 						// Outer glow
-						g.lineStyle(7, line.color, 0.2);
+						g.lineStyle(6, line.color, 0.2);
 						g.moveTo(line.points[0].x, line.points[0].y);
 						for (let i = 1; i < line.points.length; i++) g.lineTo(line.points[i].x, line.points[i].y);
 						// Core line
-						g.lineStyle(2.5, line.color, 0.85);
+						g.lineStyle(2.5, line.color, 0.8);
 						g.moveTo(line.points[0].x, line.points[0].y);
 						for (let i = 1; i < line.points.length; i++) g.lineTo(line.points[i].x, line.points[i].y);
-						// White highlight
-						g.lineStyle(1, 0xffffff, 0.5);
+						// White center
+						g.lineStyle(0.8, 0xffffff, 0.4);
 						g.moveTo(line.points[0].x, line.points[0].y);
 						for (let i = 1; i < line.points.length; i++) g.lineTo(line.points[i].x, line.points[i].y);
 					}}
 				/>
 			{/each}
 
-			<!-- Symbol highlight boxes (glow frame around winning symbols) -->
 			{#each highlightBoxes as box, i (i)}
 				<Graphics
 					draw={(g) => {
-						const pad = 4;
+						const pad = 6;
 						const size = SYMBOL_SIZE - pad * 2;
 						g.clear();
-						// Glow border
-						g.lineStyle(3, box.color, 0.6);
-						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 6);
-						// Inner subtle fill
-						g.beginFill(box.color, 0.08);
-						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 6);
+						g.lineStyle(2.5, box.color, 0.7);
+						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 8);
+						g.beginFill(box.color, 0.06);
+						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 8);
 						g.endFill();
 					}}
 				/>

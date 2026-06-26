@@ -37,10 +37,14 @@ const winLevelSoundsStop = () => {
 };
 
 const animateSymbols = async ({ positions }: { positions: Position[] }) => {
+	// Only animate symbols in visible rows (1, 2, 3) — padding rows (0, 4) have no
+	// oncomplete callback and would cause the game to freeze waiting forever.
+	const visiblePositions = positions.filter((p) => p.row >= 1 && p.row <= 3);
+	if (visiblePositions.length === 0) return;
 	eventEmitter.broadcast({ type: 'boardShow' });
 	await eventEmitter.broadcastAsync({
 		type: 'boardWithAnimateSymbols',
-		symbolPositions: positions,
+		symbolPositions: visiblePositions,
 	});
 };
 

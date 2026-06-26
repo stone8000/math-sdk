@@ -129,16 +129,16 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 		eventEmitter.broadcast({ type: 'globalMultiplierShow' });
 
 		if (targetMult > currentMult) {
-			// Animate one-by-one: each Wild adds +1, show each increment with dramatic pacing
+			// Animate one-by-one: each Wild adds +1, show each increment clearly but quickly
 			for (let mult = currentMult + 1; mult <= targetMult; mult++) {
 				stateGame.globalMultiplier = mult;
 				await eventEmitter.broadcastAsync({
 					type: 'globalMultiplierUpdate',
 					multiplier: mult,
 				});
-				// Longer pause between each increment for satisfying build-up (700ms)
+				// 350ms between each — fast enough for turbo but visible enough to follow
 				if (mult < targetMult) {
-					await waitForTimeout(700);
+					await waitForTimeout(350);
 				}
 			}
 		} else {

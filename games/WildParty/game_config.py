@@ -172,7 +172,7 @@ class GameConfig(Config):
             "force_freegame": False,
         }
 
-        mode_maxwins = {"base": self.wincap, "bonus": self.wincap}
+        mode_maxwins = {"base": self.wincap, "bonus": self.wincap, "bonus_quick": self.wincap, "bonus_super": self.wincap}
         self.bet_modes = [
             BetMode(
                 name="base",
@@ -207,6 +207,42 @@ class GameConfig(Config):
                         criteria="wincap",
                         quota=0.001,
                         win_criteria=mode_maxwins["bonus"],
+                        conditions=wincap_condition,
+                    ),
+                    Distribution(criteria="freegame", quota=0.1, conditions=freegame_condition),
+                ],
+            ),
+            BetMode(
+                name="bonus_quick",
+                cost=50.0,
+                rtp=self.rtp,
+                max_win=mode_maxwins["bonus_quick"],
+                auto_close_disabled=False,
+                is_feature=False,
+                is_buybonus=True,
+                distributions=[
+                    Distribution(
+                        criteria="wincap",
+                        quota=0.001,
+                        win_criteria=mode_maxwins["bonus_quick"],
+                        conditions=wincap_condition,
+                    ),
+                    Distribution(criteria="freegame", quota=0.15, conditions=freegame_condition),
+                ],
+            ),
+            BetMode(
+                name="bonus_super",
+                cost=200.0,
+                rtp=self.rtp,
+                max_win=mode_maxwins["bonus_super"],
+                auto_close_disabled=False,
+                is_feature=False,
+                is_buybonus=True,
+                distributions=[
+                    Distribution(
+                        criteria="wincap",
+                        quota=0.002,
+                        win_criteria=mode_maxwins["bonus_super"],
                         conditions=wincap_condition,
                     ),
                     Distribution(criteria="freegame", quota=0.1, conditions=freegame_condition),

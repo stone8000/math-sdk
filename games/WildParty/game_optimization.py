@@ -123,6 +123,110 @@ class OptimizationSetup:
                     bias_weights=[0.3],
                 ).return_dict(),
             },
+            "bonus_quick": {
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.01, av_win=wincaps["bonus_quick"], search_conditions=wincaps["bonus_quick"]
+                    ).return_dict(),
+                    "freegame": ConstructConditions(rtp=0.95, hr="x").return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 1.2,
+                            "win_range": (1, 20),
+                            "probability": 1.0,
+                        },
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 0.8,
+                            "win_range": (500, 1500),
+                            "probability": 1.0,
+                        },
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 1.2,
+                            "win_range": (2000, 4000),
+                            "probability": 1.0,
+                        },
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000,
+                    num_per_fence=10000,
+                    min_m2m=4,
+                    max_m2m=8,
+                    pmb_rtp=1.0,
+                    sim_trials=5000,
+                    test_spins=[10, 20, 50],
+                    test_weights=[0.6, 0.2, 0.2],
+                    score_type="rtp",
+                ).return_dict(),
+                "distribution_bias": ConstructFenceBias(
+                    applied_criteria=["freegame"],
+                    bias_ranges=[(100.0, 250.0)],
+                    bias_weights=[0.3],
+                ).return_dict(),
+            },
+            "bonus_super": {
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.01, av_win=wincaps["bonus_super"], search_conditions=wincaps["bonus_super"]
+                    ).return_dict(),
+                    "freegame": ConstructConditions(rtp=0.95, hr="x").return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 1.5,
+                            "win_range": (1, 30),
+                            "probability": 1.0,
+                        },
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 0.6,
+                            "win_range": (30, 80),
+                            "probability": 1.0,
+                        },
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 1.5,
+                            "win_range": (80, 200),
+                            "probability": 1.0,
+                        },
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 0.8,
+                            "win_range": (1500, 3000),
+                            "probability": 1.0,
+                        },
+                        {
+                            "criteria": "freegame",
+                            "scale_factor": 1.5,
+                            "win_range": (3500, 5000),
+                            "probability": 1.0,
+                        },
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000,
+                    num_per_fence=10000,
+                    min_m2m=4,
+                    max_m2m=8,
+                    pmb_rtp=1.0,
+                    sim_trials=5000,
+                    test_spins=[10, 20, 50],
+                    test_weights=[0.6, 0.2, 0.2],
+                    score_type="rtp",
+                ).return_dict(),
+                "distribution_bias": ConstructFenceBias(
+                    applied_criteria=["freegame"],
+                    bias_ranges=[(300.0, 500.0)],
+                    bias_weights=[0.3],
+                ).return_dict(),
+            },
         }
 
         verify_optimization_input(self.game_config, self.game_config.opt_params)

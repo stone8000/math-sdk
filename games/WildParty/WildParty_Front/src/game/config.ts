@@ -25,6 +25,20 @@ export default {
 			"buyBonus": true,
 			"rtp": 0.96,
 			"max_win": 5000.0
+		},
+		"bonus_quick": {
+			"cost": 50.0,
+			"feature": false,
+			"buyBonus": true,
+			"rtp": 0.96,
+			"max_win": 5000.0
+		},
+		"bonus_super": {
+			"cost": 200.0,
+			"feature": false,
+			"buyBonus": true,
+			"rtp": 0.96,
+			"max_win": 5000.0
 		}
 	},
 	"paylines": {
@@ -275,7 +289,13 @@ export default {
 		]
 	},
 	"symbols": {
-		"L4": {
+		"S": {
+			"paytable": null,
+			"special_properties": [
+				"scatter"
+			]
+		},
+		"L3": {
 			"paytable": [
 				{
 					"3": 0.1
@@ -284,20 +304,20 @@ export default {
 					"4": 0.3
 				},
 				{
-					"5": 0.5
+					"5": 0.7
 				}
 			]
 		},
-		"H1": {
+		"H3": {
 			"paytable": [
 				{
-					"3": 0.8
+					"3": 0.3
 				},
 				{
-					"4": 7.7
+					"4": 1.3
 				},
 				{
-					"5": 23.1
+					"5": 3.9
 				}
 			]
 		},
@@ -315,6 +335,32 @@ export default {
 			],
 			"special_properties": [
 				"wild"
+			]
+		},
+		"L2": {
+			"paytable": [
+				{
+					"3": 0.2
+				},
+				{
+					"4": 0.5
+				},
+				{
+					"5": 1.5
+				}
+			]
+		},
+		"H1": {
+			"paytable": [
+				{
+					"3": 0.8
+				},
+				{
+					"4": 7.7
+				},
+				{
+					"5": 23.1
+				}
 			]
 		},
 		"H4": {
@@ -343,10 +389,17 @@ export default {
 				}
 			]
 		},
-		"S": {
-			"paytable": null,
-			"special_properties": [
-				"scatter"
+		"L4": {
+			"paytable": [
+				{
+					"3": 0.1
+				},
+				{
+					"4": 0.3
+				},
+				{
+					"5": 0.5
+				}
 			]
 		},
 		"L1": {
@@ -359,45 +412,6 @@ export default {
 				},
 				{
 					"5": 2.1
-				}
-			]
-		},
-		"L3": {
-			"paytable": [
-				{
-					"3": 0.1
-				},
-				{
-					"4": 0.3
-				},
-				{
-					"5": 0.7
-				}
-			]
-		},
-		"L2": {
-			"paytable": [
-				{
-					"3": 0.2
-				},
-				{
-					"4": 0.5
-				},
-				{
-					"5": 1.5
-				}
-			]
-		},
-		"H3": {
-			"paytable": [
-				{
-					"3": 0.3
-				},
-				{
-					"4": 1.3
-				},
-				{
-					"5": 3.9
 				}
 			]
 		}

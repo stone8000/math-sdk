@@ -20,6 +20,8 @@ if __name__ == "__main__":
     num_sim_args = {
         "base": int(1e4),
         "bonus": int(5e4),
+        "bonus_quick": int(5e4),
+        "bonus_super": int(5e4),
     }
 
     run_conditions = {

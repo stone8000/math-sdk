@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { recordBookEvent, checkIsMultipleRevealEvents, type BookEventHandlerMap } from 'utils-book';
 import { stateBet, stateUi } from 'state-shared';
-import { sequence } from 'utils-shared/sequence';
 import { waitForTimeout } from 'utils-shared/wait';
 
 import { eventEmitter } from './eventEmitter';
@@ -73,21 +72,27 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 			symbolCount: win.positions.length,
 		}));
 
-		// In free game: show all lines instantly + highlight boxes; in base: stagger
+		// In free game: show all lines instantly; in base: stagger
 		const isFreeGame = stateGame.gameType === 'freegame';
 		await eventEmitter.broadcastAsync({ type: 'winLinesShow', wins: winLineData, fast: isFreeGame });
 
-		// Animate winning symbols (in FG: parallel for speed; in base: sequential)
-		if (isFreeGame) {
-			// All wins animate in parallel during free game — much faster
-			await Promise.all(
-				bookEvent.wins.map((win) => animateSymbols({ positions: win.positions })),
-			);
-		} else {
-			await sequence(bookEvent.wins, async (win) => {
-				await animateSymbols({ positions: win.positions });
-			});
+		// Collect ALL unique winning positions (deduplicate — same symbol can appear in
+		// multiple wins due to Wilds). Animating the same position twice would freeze
+		// because the second symbolState='win' assignment doesn't trigger $effect again.
+		const seenKey = new Set<string>();
+		const uniquePositions: Position[] = [];
+		for (const win of bookEvent.wins) {
+			for (const pos of win.positions) {
+				const key = `${pos.reel},${pos.row}`;
+				if (!seenKey.has(key)) {
+					seenKey.add(key);
+					uniquePositions.push(pos);
+				}
+			}
 		}
+
+		// Animate all unique winning symbols in one batch
+		await animateSymbols({ positions: uniquePositions });
 
 		// Clear lines
 		eventEmitter.broadcast({ type: 'winLinesHide' });

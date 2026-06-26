@@ -33,6 +33,12 @@
 			const getPromises = () =>
 				symbolPositions.map(async (position) => {
 					const reelSymbol = context.stateGame.board[position.reel].reelState.symbols[position.row];
+					if (!reelSymbol) return; // guard against invalid positions
+					// Reset to static first to ensure the state transition triggers $effect
+					if (reelSymbol.symbolState === 'win') {
+						reelSymbol.symbolState = 'static';
+						await waitForResolve((resolve) => setTimeout(resolve, 0));
+					}
 					reelSymbol.symbolState = 'win';
 					await waitForResolve((resolve) => (reelSymbol.oncomplete = resolve));
 					reelSymbol.symbolState = 'postWinStatic';

@@ -69,15 +69,23 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 			symbolCount: win.positions.length,
 		}));
 
-		// Show all winning lines (drawn one by one with stagger inside WinLines)
-		await eventEmitter.broadcastAsync({ type: 'winLinesShow', wins: winLineData });
+		// In free game: show all lines instantly + highlight boxes; in base: stagger
+		const isFreeGame = stateGame.gameType === 'freegame';
+		await eventEmitter.broadcastAsync({ type: 'winLinesShow', wins: winLineData, fast: isFreeGame });
 
-		// Animate winning symbols sequentially after lines are displayed
-		await sequence(bookEvent.wins, async (win) => {
-			await animateSymbols({ positions: win.positions });
-		});
+		// Animate winning symbols (in FG: parallel for speed; in base: sequential)
+		if (isFreeGame) {
+			// All wins animate in parallel during free game — much faster
+			await Promise.all(
+				bookEvent.wins.map((win) => animateSymbols({ positions: win.positions })),
+			);
+		} else {
+			await sequence(bookEvent.wins, async (win) => {
+				await animateSymbols({ positions: win.positions });
+			});
+		}
 
-		// Clear lines after symbol animations complete
+		// Clear lines
 		eventEmitter.broadcast({ type: 'winLinesHide' });
 	},
 	setTotalWin: async (bookEvent: BookEventOfType<'setTotalWin'>) => {

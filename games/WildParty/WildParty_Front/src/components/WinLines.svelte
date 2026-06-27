@@ -173,13 +173,35 @@
 			{#each highlightBoxes as box, i (i)}
 				<Graphics
 					draw={(g) => {
-						const pad = 6;
+						const pad = 4;
 						const size = SYMBOL_SIZE - pad * 2;
+						const cx = box.x + SYMBOL_SIZE / 2;
+						const cy = box.y + SYMBOL_SIZE / 2;
 						g.clear();
-						g.lineStyle(2.5, box.color, 0.7);
-						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 8);
-						g.beginFill(box.color, 0.06);
-						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 8);
+
+						// Outer soft glow
+						g.lineStyle(5, box.color, 0.15);
+						g.drawRoundedRect(box.x + pad - 2, box.y + pad - 2, size + 4, size + 4, 12);
+
+						// Main neon border
+						g.lineStyle(2.5, box.color, 0.85);
+						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 10);
+
+						// Inner bright edge
+						g.lineStyle(1, 0xffffff, 0.3);
+						g.drawRoundedRect(box.x + pad + 2, box.y + pad + 2, size - 4, size - 4, 8);
+
+						// Subtle fill with radial-like fade (center brighter)
+						g.beginFill(box.color, 0.05);
+						g.drawRoundedRect(box.x + pad, box.y + pad, size, size, 10);
+						g.endFill();
+
+						// Corner sparkle dots (party vibe)
+						g.beginFill(0xffffff, 0.6);
+						g.drawCircle(box.x + pad + 4, box.y + pad + 4, 1.5);
+						g.drawCircle(box.x + pad + size - 4, box.y + pad + 4, 1.5);
+						g.drawCircle(box.x + pad + 4, box.y + pad + size - 4, 1.5);
+						g.drawCircle(box.x + pad + size - 4, box.y + pad + size - 4, 1.5);
 						g.endFill();
 					}}
 				/>

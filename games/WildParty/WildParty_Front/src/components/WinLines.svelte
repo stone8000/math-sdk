@@ -17,12 +17,12 @@
 
 	import BoardContainer from './BoardContainer.svelte';
 	import { getContext } from '../game/context';
-	import { SYMBOL_SIZE } from '../game/constants';
+	import { SYMBOL_SIZE, REEL_PADDING } from '../game/constants';
 	import config from '../game/config';
 
 	const context = getContext();
 
-	// Visible row indices in the padded board array (top-pad=0, visible=1,2,3, bottom-pad=4)
+	// Visible row indices in padded array: 1=top, 2=mid, 3=bottom
 	const VISIBLE_ROW_MIN = 1;
 	const VISIBLE_ROW_MAX = 3;
 
@@ -52,17 +52,21 @@
 	let highlightBoxes = $state<HighlightBox[]>([]);
 	let show = $state(false);
 
-	// Payline values (0,1,2) → board coordinate Y.
-	// Paylines use 0=top, 1=mid, 2=bottom of the visible area.
-	// Board array has padding: visible rows are at array indices 1,2,3.
-	// Symbol Y in board coords = (arrayIndex + 0.5) * SYMBOL_SIZE
-	// So payline row 0 → array index 1 → Y center = 1.5 * SYMBOL_SIZE
-	function paylineRowToY(paylineRow: number) {
-		return (paylineRow + 1 + 0.5) * SYMBOL_SIZE;
+	// Symbol center X: same formula as getSymbolX in utils.ts
+	function symbolCenterX(reel: number) {
+		return SYMBOL_SIZE * (reel + REEL_PADDING);
 	}
 
-	function paylineRowToX(reel: number) {
-		return (reel + 0.5) * SYMBOL_SIZE;
+	// Symbol center Y accounts for the reel default offset (-SYMBOL_SIZE)
+	// Actual render: reelY(-120) + (arrayIndex + 0.5) * 120
+	// Payline rows (0,1,2) map to padded array indices (1,2,3)
+	function symbolCenterYFromPayline(paylineRow: number) {
+		return -SYMBOL_SIZE + (paylineRow + 1 + 0.5) * SYMBOL_SIZE;
+	}
+
+	// From padded row index (1,2,3 = visible rows)
+	function symbolCenterYFromRow(row: number) {
+		return -SYMBOL_SIZE + (row + 0.5) * SYMBOL_SIZE;
 	}
 
 	context.eventEmitter.subscribeOnMount({
@@ -78,23 +82,27 @@
 				const lineIdx = win.lineIndex;
 				const color = LINE_COLORS[(lineIdx - 1) % LINE_COLORS.length];
 
-				// Full payline path using config definition
+				// Full payline path
 				const paylineRows: number[] =
 					(config.paylines as Record<string, number[]>)[String(lineIdx)];
 				if (!paylineRows) continue;
 
 				const points: { x: number; y: number }[] = [];
 				for (let reel = 0; reel < paylineRows.length; reel++) {
-					points.push({ x: paylineRowToX(reel), y: paylineRowToY(paylineRows[reel]) });
+					points.push({
+						x: symbolCenterX(reel),
+						y: symbolCenterYFromPayline(paylineRows[reel]),
+					});
 				}
 				allLines.push({ lineIndex: lineIdx, color, points });
 
-				// Highlight boxes ONLY on visible winning positions
+				// Highlight boxes centered on winning symbol positions
 				for (const pos of win.positions) {
 					if (pos.row >= VISIBLE_ROW_MIN && pos.row <= VISIBLE_ROW_MAX) {
+						// Box top-left = symbol center - half symbol size
 						allBoxes.push({
-							x: pos.reel * SYMBOL_SIZE,
-							y: pos.row * SYMBOL_SIZE,
+							x: symbolCenterX(pos.reel) - SYMBOL_SIZE / 2,
+							y: symbolCenterYFromRow(pos.row) - SYMBOL_SIZE / 2,
 							color,
 						});
 					}
@@ -102,19 +110,24 @@
 			}
 
 			if (fast) {
-				// Free game: all at once, quick hold
 				drawnLines = allLines;
 				highlightBoxes = allBoxes;
 				await waitForTimeout(350);
 			} else {
-				// Base game: stagger
 				for (let i = 0; i < allLines.length; i++) {
 					drawnLines = [...drawnLines, allLines[i]];
 					const win = wins[i];
 					for (const pos of win.positions) {
 						if (pos.row >= VISIBLE_ROW_MIN && pos.row <= VISIBLE_ROW_MAX) {
 							const color = LINE_COLORS[(win.lineIndex - 1) % LINE_COLORS.length];
-							highlightBoxes = [...highlightBoxes, { x: pos.reel * SYMBOL_SIZE, y: pos.row * SYMBOL_SIZE, color }];
+							highlightBoxes = [
+								...highlightBoxes,
+								{
+									x: symbolCenterX(pos.reel) - SYMBOL_SIZE / 2,
+									y: symbolCenterYFromRow(pos.row) - SYMBOL_SIZE / 2,
+									color,
+								},
+							];
 						}
 					}
 					if (i < allLines.length - 1) {
@@ -144,15 +157,12 @@
 					draw={(g) => {
 						if (!line.points || line.points.length < 2) return;
 						g.clear();
-						// Outer glow
 						g.lineStyle(6, line.color, 0.2);
 						g.moveTo(line.points[0].x, line.points[0].y);
 						for (let i = 1; i < line.points.length; i++) g.lineTo(line.points[i].x, line.points[i].y);
-						// Core line
 						g.lineStyle(2.5, line.color, 0.8);
 						g.moveTo(line.points[0].x, line.points[0].y);
 						for (let i = 1; i < line.points.length; i++) g.lineTo(line.points[i].x, line.points[i].y);
-						// White center
 						g.lineStyle(0.8, 0xffffff, 0.4);
 						g.moveTo(line.points[0].x, line.points[0].y);
 						for (let i = 1; i < line.points.length; i++) g.lineTo(line.points[i].x, line.points[i].y);

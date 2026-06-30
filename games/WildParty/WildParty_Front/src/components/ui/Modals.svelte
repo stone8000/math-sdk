@@ -144,25 +144,21 @@
 		) !important;
 		border: 1px solid var(--wp-line) !important;
 		border-radius: 13px !important;
-		box-shadow:
-			0 3px 14px rgba(120, 30, 200, 0.18),
-			inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 		transition: transform 0.18s var(--wp-ease), border-color 0.2s ease,
 			box-shadow 0.2s ease, background 0.2s ease !important;
 	}
 	:global(.button:hover .rectangle) {
 		border-color: var(--wp-line-strong) !important;
 		box-shadow:
-			0 6px 22px rgba(200, 80, 255, 0.3),
+			0 0 18px rgba(200, 80, 255, 0.25),
 			0 0 0 1px rgba(255, 211, 77, 0.15),
 			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 		transform: translateY(-1px);
 	}
 	:global(.button:active .rectangle) {
 		border-color: rgba(255, 211, 77, 0.6) !important;
-		box-shadow:
-			0 1px 6px rgba(200, 80, 255, 0.3),
-			inset 0 2px 5px rgba(0, 0, 0, 0.45) !important;
+		box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45) !important;
 		transform: scale(0.96);
 	}
 
@@ -182,9 +178,7 @@
 		letter-spacing: 0.04em !important;
 		border: none !important;
 		border-radius: 12px !important;
-		box-shadow:
-			0 8px 24px rgba(255, 122, 217, 0.28),
-			inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
 		transition: transform 0.18s var(--wp-ease), box-shadow 0.2s ease,
 			background-position 0.4s ease !important;
 	}
@@ -197,7 +191,7 @@
 		background-position: right center !important;
 		transform: translateY(-2px);
 		box-shadow:
-			0 12px 30px rgba(255, 122, 217, 0.4),
+			0 0 28px rgba(255, 122, 217, 0.35),
 			0 0 24px rgba(255, 211, 77, 0.25),
 			inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
 	}

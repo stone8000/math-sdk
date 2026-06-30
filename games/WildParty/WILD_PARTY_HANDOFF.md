@@ -636,6 +636,41 @@ git checkout main && git merge feature/ui-v2
 
 **不會被 git 追蹤：** `library/`（重跑 `run.py`）、`node_modules/`、`.svelte-kit/`。
 
+### 5.7 前端上傳前重建（pull → build → 驗證）— ★ 改過 `src/` 必做
+
+> **重要觀念：** 改 `src/` 原始碼**不會**自動更新 `build/`。`build/` 是 `pnpm build` 的產物；
+> 沒重新 build，上傳的就是**舊樣式**。Stake 看到的永遠是 `build/` 的內容，不是 `src/`。
+>
+> **另一個坑：** 單獨 clone 的 `math-sdk`（無 web-sdk monorepo）**無法 build**，
+> 因 app 相依全為 `workspace:*`。重建一定要在 `~/Stake_Engine/` 完整 monorepo 跑。
+
+**一鍵腳本（本機）：**
+
+```bash
+cd ~/Stake_Engine/math-sdk/games/WildParty
+bash rebuild_and_check.sh
+```
+
+腳本會：`git pull origin main` → `fix_links.py` → `pnpm build` → 驗證
+`build/index.html` 是剛產生的、必要檔案齊全、符號 PNG = 10。
+
+**手動等效流程：**
+
+```bash
+cd ~/Stake_Engine/math-sdk && git pull origin main          # 1) 拉新 src
+cd games/WildParty/WildParty_Front
+pnpm build                                                  # 2) 重建 build/
+ls -la build/index.html                                     # 3) 確認時間戳是「剛剛」
+pnpm dev                                                    # 4) localhost:3001 開 modal 驗收
+# 5) 上傳 build/ 內容到 Stake → Play Game 確認不黑屏
+git add games/WildParty/WildParty_Front/build
+git commit -m "rebuild build/ with <改了什麼>"
+git push origin main
+```
+
+**判斷 build 是否為新版：** 看 `build/index.html` 時間戳。若不是「剛剛」，build 沒成功重跑
+（vite 完成後 node 程序常不自動退出、看似卡住，見 §9）。
+
 ---
 
 ## 6. 關鍵檔案對照表
@@ -688,6 +723,7 @@ git checkout main && git merge feature/ui-v2
 | `gen_stories.py` | math books → Storybook 資料 |
 | `process_symbols.py` | AI 圖去背 → 符號 sprite |
 | `fix_links.py` | 修復 pnpm workspace symlink |
+| `rebuild_and_check.sh` | 本機一鍵：pull → build → 驗證 build/ 為新版（見 §5.7） |
 
 ---
 

@@ -1,0 +1,653 @@
+From abd94abdb7c38222fdf53eaabbfbe7f697bb0865 Mon Sep 17 00:00:00 2001
+From: stone8000 <stone7000@gmail.com>
+Date: Tue, 30 Jun 2026 20:38:40 +0800
+Subject: [PATCH 1/2] =?UTF-8?q?HTML=20UI=20=E9=AB=98=E7=B4=9A=E6=84=9F?=
+ =?UTF-8?q?=E5=8D=87=E7=B4=9A=EF=BC=9A=E7=B5=B1=E4=B8=80=E6=B4=BE=E5=B0=8D?=
+ =?UTF-8?q?=E8=A8=AD=E8=A8=88=E7=B3=BB=E7=B5=B1?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+把所有 HTML 層 UI（共享 modals + 本地 PayTable/Rules）統一成一套
+金→粉→紫漸層的「派對」設計系統，提升質感與一致性。範圍僅 HTML 層，
+不動 web-sdk / Pixi 主控列 / loader 流程，風險低。
+
+為什麼：原本 PayTable/Rules 用粉金、共享 modal 用素紫，視覺不一致；
+共享 modal 按鈕也缺乏高級感。
+
+改了什麼：
+- Modals.svelte：新增 :root design token；按鈕分層（玻璃圖示鈕／
+  漸層主要鈕含 sheen 掃光／outlined 次要鈕）；面板頂緣漸層 hairline
+  + radial 背景模糊；表單控件（pill 開關、發光 slider、聚焦光環）；
+  × 旋轉、金額金色發光、漸層捲軸；prefers-reduced-motion fallback
+- ModalPayTable.svelte / ModalGameRules.svelte：補 prefers-reduced-motion
+- WILD_PARTY_HANDOFF.md：新增 §4.16、更新時間線與踩坑表
+
+注意：build/ 需在 ~/Stake_Engine/ 完整 monorepo 跑 pnpm build 重產後上傳。
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+---
+ games/WildParty/WILD_PARTY_HANDOFF.md         |  48 ++-
+ .../src/components/ui/ModalGameRules.svelte   |  13 +
+ .../src/components/ui/ModalPayTable.svelte    |  13 +
+ .../src/components/ui/Modals.svelte           | 368 +++++++++++++++---
+ 4 files changed, 377 insertions(+), 65 deletions(-)
+
+diff --git a/games/WildParty/WILD_PARTY_HANDOFF.md b/games/WildParty/WILD_PARTY_HANDOFF.md
+index 9953b9d..e1f8d15 100644
+--- a/games/WildParty/WILD_PARTY_HANDOFF.md
++++ b/games/WildParty/WILD_PARTY_HANDOFF.md
+@@ -1,6 +1,6 @@
+ # Wild Party — 專案交接文件
+ 
+-> 最後更新：2026-06-30（報獎動畫回復原版 + TURBO 開關色彩強化）  
++> 最後更新：2026-06-30（HTML UI 高級感升級 — 統一派對設計系統）  
+ > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
+ > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
+ 
+@@ -469,6 +469,50 @@ git -c http.version=HTTP/1.1 -c http.postBuffer=524288000 push mine main
+   - ON：橘色按鈕底 + 白色閃電（高對比）
+ - [x] 前端重建並同步 `WildParty_Front/build/`（可直接上傳 Stake）
+ 
++### 4.16 第七波更新（2026-06-30）— HTML UI 高級感升級（統一派對設計系統）
++
++目標：把所有 **HTML 層 UI**（共享 modals + 本地 PayTable/Rules）統一成一套高級感的「派對」設計系統。
++
++**範圍說明（重要）：** 底部主控制列的 spin / bet / turbo / autoplay 按鈕是 **PixiJS**，由 web-sdk 的 `UiSprite.svelte` 渲染（見 §4.12），**不在 HTML 層**。本次只升級 **HTML 層**（modals 與其按鈕、面板、表單控件），不動 web-sdk、不動 Pixi 主控列、不動 loader 流程 → 風險低。
++
++參考 skill（`Slot-Casino-Game-Developer-Skills-for-Stake-Engine`）：
++- `ui-slot-ux-designer` — 控制階層、44px 觸控、`prefers-reduced-motion`、對比
++- `slot-ui-studio` — 共享元件治理、本地覆寫邊界
++- `css-motion-designer` — 短迴圈動效、palette 紀律
++
++**改動內容：**
++
++- [x] **設計 token 化**：`Modals.svelte` 新增 `:root` CSS 變數（金 `#ffd34d` → 粉 `#ff7ad9` → 紫 `#a855f7` 漸層、surface、line、ease），三個 modal 共用同一 palette
++  - 修正原本不一致：PayTable/Rules 用粉金、共享 modal 用素紫 → 現統一
++- [x] **按鈕分層**
++  - 圖示鈕（`.rectangle`）：玻璃質感 chip，hover 上浮 + 雙重發光 + 金色描邊
++  - 主要動作鈕（`button.primary` / `.confirm` / `[type=submit]` / `.buy-button`）：漸層填色 + **流動 sheen 掃光動畫** + hover 位移
++  - 次要鈕（`.secondary` / `.cancel`）：outlined glass
++- [x] **面板質感**：popup 頂緣漸層 hairline、radial 背景模糊（`.blur-layer`）、深紫毛玻璃內容區
++- [x] **表單控件**：checkbox → 漸層 pill 開關；range slider → 金色發光把手；input/select 聚焦光環
++- [x] **細節**：× 關閉鈕 hover 旋轉 90°、金額數字金色發光、漸層捲軸
++- [x] **可及性**：三個 modal 全套 `prefers-reduced-motion` fallback（關閉掃光/旋轉/位移）
++
++**檔案：**
++
++| 檔案 | 變更 |
++|------|------|
++| `src/components/ui/Modals.svelte` | 主升級 — 全域樣式系統重寫（design token、按鈕分層、表單控件、掃光動畫、reduced-motion） |
++| `src/components/ui/ModalPayTable.svelte` | 補 `prefers-reduced-motion` |
++| `src/components/ui/ModalGameRules.svelte` | 補 `prefers-reduced-motion` |
++
++> 純 HTML/CSS 樣式層，只會編進 `build/_app/` bundle，**不影響數學 `publish_files/`**（不用重傳數學）。
++
++**重建並上傳（在有 web-sdk monorepo 的本機執行）：**
++
++```bash
++cd ~/Stake_Engine/math-sdk/games/WildParty/WildParty_Front
++pnpm build            # → build/ 重新產生（CSS 編進 _app/）
++pnpm dev              # localhost:3001 開任一 modal 驗收新樣式
++```
++
++> ⚠️ 此次程式碼變更在獨立 clone 完成（無 web-sdk，無法在該環境 build）。**`pnpm build` 必須在 `~/Stake_Engine/` monorepo 本機跑**，再上傳 `build/`。
++
+ ---
+ 
+ ## 5. 常用指令
+@@ -783,6 +827,7 @@ pnpm build
+ | **buy bonus 出現無法遊玩的多餘選項** | 共享 `DEFAULT_BET_MODE_META` 範本含 6 模式且 `Authenticate` 不回寫；在遊戲端覆寫 `stateMeta.betModeMeta`（見 §4.13、`src/game/betModeMeta.ts`） |
+ | **本地 modal（PayTable/Rules）無法滾動、點內容會關閉** | 共享 `Popup` 的 `.click-to-close-layer`（z-index:2）蓋住內容；本地內容容器需 `position:relative; z-index:100`（見 §4.13） |
+ | info 頁顯示「Add Your Loader」/ 感覺沒 loader | 那是 web-sdk 範本 `LoaderExample` 佔位；用本地 `WildPartyLoader.svelte` 取代（見 §4.13） |
++| **單獨 clone `math-sdk`（無 web-sdk）無法 build** | app 依賴全為 `workspace:*`（web-sdk 套件 + 共享 config），單獨 clone 無 `node_modules`／無 monorepo → `pnpm install`／`pnpm build` 失敗。改 code 可在任何 clone，但 **`pnpm build` 必須在 `~/Stake_Engine/` 完整 monorepo 跑**（見 §4.16） |
+ 
+ ---
+ 
+@@ -850,6 +895,7 @@ bgm_base (loop), bgm_freegame (loop)
+ | 22 | info 頁可滾動 + 補完內容 | Popup z-index 修復 + 規則補完；§4.13、`7a59929` |
+ | 23 | 簡單 loader | `WildPartyLoader.svelte`；§4.13、`b667754` |
+ | 24 | 送審 Game Details + 寫入交接 | §14 介紹文、§4.13、§9 踩坑 |
++| 25 | HTML UI 高級感升級 | 統一派對設計系統、按鈕分層、表單控件、reduced-motion；§4.16 |
+ 
+ ---
+ 
+diff --git a/games/WildParty/WildParty_Front/src/components/ui/ModalGameRules.svelte b/games/WildParty/WildParty_Front/src/components/ui/ModalGameRules.svelte
+index 7b17347..c2b7dee 100644
+--- a/games/WildParty/WildParty_Front/src/components/ui/ModalGameRules.svelte
++++ b/games/WildParty/WildParty_Front/src/components/ui/ModalGameRules.svelte
+@@ -242,4 +242,17 @@
+ 		line-height: 1.45;
+ 		letter-spacing: 0.02em;
+ 	}
++
++	@media (prefers-reduced-motion: reduce) {
++		.wp-rules,
++		.wp-card,
++		.wp-accent-bar,
++		h2 {
++			animation: none !important;
++		}
++		.wp-card,
++		.wp-card:hover {
++			transition: none !important;
++		}
++	}
+ </style>
+diff --git a/games/WildParty/WildParty_Front/src/components/ui/ModalPayTable.svelte b/games/WildParty/WildParty_Front/src/components/ui/ModalPayTable.svelte
+index 6c1e073..5fa74be 100644
+--- a/games/WildParty/WildParty_Front/src/components/ui/ModalPayTable.svelte
++++ b/games/WildParty/WildParty_Front/src/components/ui/ModalPayTable.svelte
+@@ -303,4 +303,17 @@
+ 		font-weight: 700;
+ 		text-shadow: 0 0 12px rgba(255, 122, 217, 0.4);
+ 	}
++
++	@media (prefers-reduced-motion: reduce) {
++		.wp-paytable,
++		.wp-row,
++		h2 {
++			animation: none !important;
++		}
++		.wp-row,
++		.wp-row:hover,
++		.wp-symbol-glow img {
++			transition: none !important;
++		}
++	}
+ </style>
+diff --git a/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte b/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte
+index 31d294b..0da9019 100644
+--- a/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte
++++ b/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte
+@@ -43,107 +43,347 @@
+ 	}
+ 
+ 	/* ═══════════════════════════════════════════════════════
+-	   Wild Party — Premium Button & Modal Styling
+-	   Targets the actual shared component class names:
+-	   - .button (components-shared/Button.svelte)
+-	   - .rectangle (components-ui-html/BaseIcon.svelte)
+-	   - .pop-up-wrap (components-shared/Popup.svelte)
+-	   - .close-button (components-shared/Popup.svelte)
++	   WILD PARTY — Premium HTML-UI Design System
++	   ───────────────────────────────────────────────────────
++	   One coherent "party" palette (gold → pink → purple) shared
++	   with ModalPayTable / ModalGameRules. Applied globally to
++	   every shared HTML modal (settings, bet menu, buy bonus,
++	   autospin, error) since their internals live in web-sdk and
++	   can only be reached via the shared class names below:
++	     .button              components-shared/Button.svelte
++	     .rectangle           components-ui-html/BaseIcon.svelte
++	     .pop-up-wrap         components-shared/Popup.svelte
++	     .close-button        components-shared/Popup.svelte
++	     .blur-layer          modal backdrop
++	     .ui-popup-*          popup content wrappers
++	   Everything is !important because we override compiled
++	   web-sdk styles from outside the package.
+ 	   ═══════════════════════════════════════════════════════ */
+ 
+-	/* Button icon background (the black rounded rectangle inside buttons) */
++	:global(:root) {
++		/* party palette */
++		--wp-gold: #ffd34d;
++		--wp-gold-deep: #ffaa00;
++		--wp-pink: #ff7ad9;
++		--wp-purple: #a855f7;
++		/* surfaces */
++		--wp-surface-1: rgba(255, 255, 255, 0.04);
++		--wp-surface-2: rgba(255, 255, 255, 0.07);
++		--wp-line: rgba(255, 122, 217, 0.18);
++		--wp-line-strong: rgba(255, 122, 217, 0.45);
++		/* the signature action gradient */
++		--wp-accent-grad: linear-gradient(135deg, #ffd34d 0%, #ff7ad9 52%, #a855f7 100%);
++		--wp-ease: cubic-bezier(0.22, 1, 0.36, 1);
++	}
++
++	/* ─── Backdrop ─── */
++	:global(.blur-layer) {
++		background: radial-gradient(
++			120% 120% at 50% 30%,
++			rgba(40, 6, 60, 0.62) 0%,
++			rgba(6, 0, 14, 0.82) 100%
++		) !important;
++		backdrop-filter: blur(6px) saturate(1.1) !important;
++		-webkit-backdrop-filter: blur(6px) saturate(1.1) !important;
++	}
++
++	/* ─── Popup content panel ─── */
++	:global(.ui-popup-standard-content-wrap) {
++		position: relative;
++		background: linear-gradient(
++			180deg,
++			rgba(28, 8, 50, 0.97) 0%,
++			rgba(12, 3, 26, 0.98) 100%
++		) !important;
++		border: 1px solid var(--wp-line) !important;
++		border-radius: 18px !important;
++		padding: 1.6rem !important;
++		box-shadow:
++			0 24px 60px rgba(0, 0, 0, 0.7),
++			0 0 100px rgba(168, 85, 247, 0.08),
++			inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
++	}
++	/* hairline gradient frame on top edge for a premium "lit" feel */
++	:global(.ui-popup-standard-content-wrap)::before {
++		content: '';
++		position: absolute;
++		inset: 0 0 auto 0;
++		height: 2px;
++		border-radius: 18px 18px 0 0;
++		background: var(--wp-accent-grad);
++		opacity: 0.85;
++		pointer-events: none;
++	}
++
++	/* ─── Modal heading text inside shared modals ─── */
++	:global(.pop-up-wrap h1),
++	:global(.pop-up-wrap h2),
++	:global(.pop-up-wrap .title) {
++		background: var(--wp-accent-grad) !important;
++		background-size: 200% auto !important;
++		-webkit-background-clip: text !important;
++		background-clip: text !important;
++		-webkit-text-fill-color: transparent !important;
++		letter-spacing: 0.06em !important;
++		filter: drop-shadow(0 0 14px rgba(255, 122, 217, 0.4));
++	}
++
++	/* ═══ Buttons ════════════════════════════════════════════
++	   Two tiers:
++	   • icon buttons (.rectangle inside .button) → glass chips
++	   • primary action buttons (confirm / buy) → gradient fill
++	   ════════════════════════════════════════════════════════ */
++
++	/* icon-button glass chip */
+ 	:global(.rectangle) {
+ 		background: linear-gradient(
+ 			160deg,
+-			rgba(30, 5, 50, 0.95) 0%,
+-			rgba(15, 2, 30, 0.98) 40%,
+-			rgba(25, 5, 45, 0.95) 100%
++			rgba(48, 14, 78, 0.92) 0%,
++			rgba(20, 5, 38, 0.96) 55%,
++			rgba(34, 9, 58, 0.92) 100%
+ 		) !important;
+-		border: 1px solid rgba(200, 100, 255, 0.35) !important;
+-		border-radius: 10px !important;
++		border: 1px solid var(--wp-line) !important;
++		border-radius: 13px !important;
+ 		box-shadow:
+-			0 2px 10px rgba(180, 50, 255, 0.15),
+-			inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+-		transition: all 0.2s ease !important;
++			0 3px 14px rgba(120, 30, 200, 0.18),
++			inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
++		transition: transform 0.18s var(--wp-ease), border-color 0.2s ease,
++			box-shadow 0.2s ease, background 0.2s ease !important;
+ 	}
+-
+-	/* Button wrapper hover/active states */
+ 	:global(.button:hover .rectangle) {
+-		border-color: rgba(220, 120, 255, 0.6) !important;
++		border-color: var(--wp-line-strong) !important;
+ 		box-shadow:
+-			0 4px 18px rgba(200, 80, 255, 0.25),
+-			inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
++			0 6px 22px rgba(200, 80, 255, 0.3),
++			0 0 0 1px rgba(255, 211, 77, 0.15),
++			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
++		transform: translateY(-1px);
+ 	}
+-
+ 	:global(.button:active .rectangle) {
+-		border-color: rgba(255, 150, 255, 0.7) !important;
++		border-color: rgba(255, 211, 77, 0.6) !important;
+ 		box-shadow:
+ 			0 1px 6px rgba(200, 80, 255, 0.3),
+-			inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+-		transform: scale(0.97);
++			inset 0 2px 5px rgba(0, 0, 0, 0.45) !important;
++		transform: scale(0.96);
+ 	}
+ 
+-	/* Close button (×) */
+-	:global(.close-button) {
+-		color: rgba(200, 150, 255, 0.8) !important;
+-		transition: color 0.2s ease, text-shadow 0.2s ease !important;
++	/* primary / confirm / submit action buttons → gradient fill + sheen */
++	:global(.pop-up-wrap button.primary),
++	:global(.pop-up-wrap button.confirm),
++	:global(.pop-up-wrap button[type='submit']),
++	:global(.pop-up-wrap .button-primary),
++	:global(.pop-up-wrap .submit-button),
++	:global(.pop-up-wrap .buy-button) {
++		position: relative;
++		overflow: hidden;
++		background: var(--wp-accent-grad) !important;
++		background-size: 180% auto !important;
++		color: #1a0322 !important;
++		font-weight: 800 !important;
++		letter-spacing: 0.04em !important;
++		border: none !important;
++		border-radius: 12px !important;
++		box-shadow:
++			0 8px 24px rgba(255, 122, 217, 0.28),
++			inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
++		transition: transform 0.18s var(--wp-ease), box-shadow 0.2s ease,
++			background-position 0.4s ease !important;
++	}
++	:global(.pop-up-wrap button.primary:hover),
++	:global(.pop-up-wrap button.confirm:hover),
++	:global(.pop-up-wrap button[type='submit']:hover),
++	:global(.pop-up-wrap .button-primary:hover),
++	:global(.pop-up-wrap .submit-button:hover),
++	:global(.pop-up-wrap .buy-button:hover) {
++		background-position: right center !important;
++		transform: translateY(-2px);
++		box-shadow:
++			0 12px 30px rgba(255, 122, 217, 0.4),
++			0 0 24px rgba(255, 211, 77, 0.25),
++			inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
++	}
++	:global(.pop-up-wrap button.primary:active),
++	:global(.pop-up-wrap button.confirm:active),
++	:global(.pop-up-wrap button[type='submit']:active),
++	:global(.pop-up-wrap .button-primary:active),
++	:global(.pop-up-wrap .submit-button:active),
++	:global(.pop-up-wrap .buy-button:active) {
++		transform: translateY(0) scale(0.98);
++	}
++	/* moving sheen sweep across primary buttons */
++	:global(.pop-up-wrap button.primary)::after,
++	:global(.pop-up-wrap button.confirm)::after,
++	:global(.pop-up-wrap button[type='submit'])::after,
++	:global(.pop-up-wrap .button-primary)::after,
++	:global(.pop-up-wrap .buy-button)::after {
++		content: '';
++		position: absolute;
++		top: 0;
++		left: -60%;
++		width: 40%;
++		height: 100%;
++		background: linear-gradient(
++			100deg,
++			transparent,
++			rgba(255, 255, 255, 0.55),
++			transparent
++		);
++		transform: skewX(-20deg);
++		animation: wpSheen 4.5s ease-in-out infinite;
++		pointer-events: none;
++	}
++	@keyframes wpSheen {
++		0%, 60% { left: -60%; }
++		85%, 100% { left: 130%; }
++	}
++
++	/* secondary buttons (cancel / value steppers) → outlined glass */
++	:global(.pop-up-wrap button.secondary),
++	:global(.pop-up-wrap button.cancel),
++	:global(.pop-up-wrap .button-secondary) {
++		background: var(--wp-surface-1) !important;
++		color: #fff !important;
++		border: 1px solid var(--wp-line) !important;
++		border-radius: 12px !important;
++		font-weight: 700 !important;
++		transition: all 0.2s var(--wp-ease) !important;
++	}
++	:global(.pop-up-wrap button.secondary:hover),
++	:global(.pop-up-wrap button.cancel:hover),
++	:global(.pop-up-wrap .button-secondary:hover) {
++		background: rgba(255, 122, 217, 0.1) !important;
++		border-color: var(--wp-line-strong) !important;
++		box-shadow: 0 0 16px rgba(255, 122, 217, 0.18) !important;
+ 	}
+ 
++	/* ─── Close button (×) ─── */
++	:global(.close-button) {
++		color: rgba(255, 200, 245, 0.85) !important;
++		transition: color 0.2s ease, text-shadow 0.2s ease, transform 0.2s var(--wp-ease) !important;
++	}
+ 	:global(.close-button:hover) {
+ 		color: #fff !important;
+-		text-shadow: 0 0 12px rgba(255, 100, 255, 0.8) !important;
++		text-shadow: 0 0 14px rgba(255, 122, 217, 0.9) !important;
++		transform: rotate(90deg) scale(1.1);
+ 	}
+ 
+-	/* Modal backdrop blur layer */
+-	:global(.blur-layer) {
+-		background-color: rgba(5, 0, 15, 0.7) !important;
++	/* ─── Value pills / amounts (bet, balance, win figures in modals) ─── */
++	:global(.pop-up-wrap .value),
++	:global(.pop-up-wrap .amount),
++	:global(.pop-up-wrap .bet-value) {
++		color: var(--wp-gold) !important;
++		font-weight: 800 !important;
++		text-shadow: 0 0 12px rgba(255, 211, 77, 0.3);
+ 	}
+ 
+-	/* Content wrapper in modals */
+-	:global(.ui-popup-standard-content-wrap) {
+-		background: linear-gradient(
+-			180deg,
+-			rgba(18, 4, 35, 0.96) 0%,
+-			rgba(10, 2, 22, 0.98) 100%
+-		) !important;
+-		border: 1px solid rgba(180, 80, 255, 0.2) !important;
+-		border-radius: 14px !important;
+-		padding: 1.5rem !important;
+-		box-shadow:
+-			0 12px 40px rgba(0, 0, 0, 0.7),
+-			0 0 80px rgba(150, 50, 255, 0.06) !important;
++	/* ═══ Form controls ══════════════════════════════════════ */
++
++	/* premium toggle switch (checkbox styled as a pill) */
++	:global(.pop-up-wrap input[type='checkbox']) {
++		appearance: none;
++		-webkit-appearance: none;
++		width: 2.6rem !important;
++		height: 1.4rem !important;
++		border-radius: 1rem !important;
++		background: rgba(20, 5, 40, 0.9) !important;
++		border: 1px solid var(--wp-line) !important;
++		position: relative;
++		cursor: pointer;
++		transition: background 0.25s var(--wp-ease), border-color 0.25s ease !important;
++		flex-shrink: 0;
++	}
++	:global(.pop-up-wrap input[type='checkbox'])::after {
++		content: '';
++		position: absolute;
++		top: 50%;
++		left: 0.18rem;
++		width: 1rem;
++		height: 1rem;
++		border-radius: 50%;
++		background: #fff;
++		transform: translateY(-50%);
++		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
++		transition: left 0.25s var(--wp-ease), background 0.25s ease;
++	}
++	:global(.pop-up-wrap input[type='checkbox']:checked) {
++		background: var(--wp-accent-grad) !important;
++		border-color: transparent !important;
++	}
++	:global(.pop-up-wrap input[type='checkbox']:checked)::after {
++		left: calc(100% - 1.18rem);
++		background: #1a0322;
+ 	}
+ 
+-	/* Scrollbar premium styling */
++	/* text / number inputs & selects */
++	:global(.pop-up-wrap input[type='text']),
++	:global(.pop-up-wrap input[type='number']),
++	:global(.pop-up-wrap select) {
++		background: rgba(20, 5, 40, 0.85) !important;
++		border: 1px solid var(--wp-line) !important;
++		border-radius: 10px !important;
++		color: #fff !important;
++		padding: 0.4rem 0.7rem !important;
++		transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
++	}
++	:global(.pop-up-wrap input:focus),
++	:global(.pop-up-wrap select:focus) {
++		border-color: var(--wp-line-strong) !important;
++		outline: none !important;
++		box-shadow: 0 0 0 3px rgba(255, 122, 217, 0.15) !important;
++	}
++
++	/* range slider (bet amount / autoplay count) */
++	:global(.pop-up-wrap input[type='range']) {
++		appearance: none;
++		-webkit-appearance: none;
++		height: 6px !important;
++		border-radius: 3px !important;
++		background: linear-gradient(90deg, var(--wp-pink), var(--wp-purple)) !important;
++		outline: none;
++	}
++	:global(.pop-up-wrap input[type='range'])::-webkit-slider-thumb {
++		-webkit-appearance: none;
++		width: 18px;
++		height: 18px;
++		border-radius: 50%;
++		background: var(--wp-gold);
++		border: 2px solid #fff;
++		box-shadow: 0 0 10px rgba(255, 211, 77, 0.6);
++		cursor: pointer;
++		transition: transform 0.15s var(--wp-ease);
++	}
++	:global(.pop-up-wrap input[type='range']:hover)::-webkit-slider-thumb {
++		transform: scale(1.15);
++	}
++
++	/* ─── Scrollbars (modal-wide) ─── */
+ 	:global(::-webkit-scrollbar) {
+-		width: 5px;
++		width: 6px;
++		height: 6px;
+ 	}
+ 	:global(::-webkit-scrollbar-track) {
+ 		background: rgba(10, 0, 20, 0.4);
+ 		border-radius: 3px;
+ 	}
+ 	:global(::-webkit-scrollbar-thumb) {
+-		background: linear-gradient(180deg, rgba(180, 80, 255, 0.4), rgba(100, 30, 180, 0.4));
++		background: linear-gradient(180deg, var(--wp-pink), var(--wp-purple));
+ 		border-radius: 3px;
+ 	}
+ 	:global(::-webkit-scrollbar-thumb:hover) {
+-		background: linear-gradient(180deg, rgba(200, 100, 255, 0.6), rgba(120, 50, 200, 0.6));
+-	}
+-
+-	/* Toggle / checkbox inputs in modals */
+-	:global(.pop-up-wrap input),
+-	:global(.pop-up-wrap select) {
+-		background: rgba(20, 5, 40, 0.8) !important;
+-		border: 1px solid rgba(180, 80, 255, 0.25) !important;
+-		border-radius: 6px !important;
+-		color: #fff !important;
+-		transition: border-color 0.2s ease !important;
++		background: linear-gradient(180deg, var(--wp-gold), var(--wp-pink));
+ 	}
+ 
+-	:global(.pop-up-wrap input:focus),
+-	:global(.pop-up-wrap select:focus) {
+-		border-color: rgba(200, 100, 255, 0.5) !important;
+-		outline: none !important;
+-		box-shadow: 0 0 8px rgba(180, 80, 255, 0.2) !important;
++	/* ─── Accessibility: respect reduced motion ─── */
++	@media (prefers-reduced-motion: reduce) {
++		:global(.pop-up-wrap button.primary)::after,
++		:global(.pop-up-wrap button.confirm)::after,
++		:global(.pop-up-wrap button[type='submit'])::after,
++		:global(.pop-up-wrap .button-primary)::after,
++		:global(.pop-up-wrap .buy-button)::after {
++			animation: none;
++			display: none;
++		}
++		:global(.close-button:hover) {
++			transform: none;
++		}
+ 	}
+ </style>
+-- 
+2.52.0.windows.1
+
+
+From 2080a348b77b6e8ce64df8b3bd95085521e2b50d Mon Sep 17 00:00:00 2001
+From: stone8000 <stone7000@gmail.com>
+Date: Tue, 30 Jun 2026 20:50:06 +0800
+Subject: [PATCH 2/2] =?UTF-8?q?=E7=A7=BB=E9=99=A4=E6=8C=89=E9=88=95?=
+ =?UTF-8?q?=E6=96=B9=E5=90=91=E6=80=A7=E6=8A=95=E5=BD=B1=EF=BC=8C=E6=94=B9?=
+ =?UTF-8?q?=E7=82=BA=E5=9D=87=E5=8B=BB=E7=99=BC=E5=85=89?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+使用者回報按鈕下方有「一條陰影」（drop shadow 偏移投影）。
+移除圖示鈕與主要鈕 idle/hover/active 的有偏移投影（0 8px 24px 等），
+保留 inset 高光與 hover 的均勻 glow（0 0 …，無偏移），維持高級感但不再拉出底部陰影。
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+---
+ .../src/components/ui/Modals.svelte              | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte b/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte
+index 0da9019..2a4dd8d 100644
+--- a/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte
++++ b/games/WildParty/WildParty_Front/src/components/ui/Modals.svelte
+@@ -144,25 +144,21 @@
+ 		) !important;
+ 		border: 1px solid var(--wp-line) !important;
+ 		border-radius: 13px !important;
+-		box-shadow:
+-			0 3px 14px rgba(120, 30, 200, 0.18),
+-			inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
++		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+ 		transition: transform 0.18s var(--wp-ease), border-color 0.2s ease,
+ 			box-shadow 0.2s ease, background 0.2s ease !important;
+ 	}
+ 	:global(.button:hover .rectangle) {
+ 		border-color: var(--wp-line-strong) !important;
+ 		box-shadow:
+-			0 6px 22px rgba(200, 80, 255, 0.3),
++			0 0 18px rgba(200, 80, 255, 0.25),
+ 			0 0 0 1px rgba(255, 211, 77, 0.15),
+ 			inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+ 		transform: translateY(-1px);
+ 	}
+ 	:global(.button:active .rectangle) {
+ 		border-color: rgba(255, 211, 77, 0.6) !important;
+-		box-shadow:
+-			0 1px 6px rgba(200, 80, 255, 0.3),
+-			inset 0 2px 5px rgba(0, 0, 0, 0.45) !important;
++		box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45) !important;
+ 		transform: scale(0.96);
+ 	}
+ 
+@@ -182,9 +178,7 @@
+ 		letter-spacing: 0.04em !important;
+ 		border: none !important;
+ 		border-radius: 12px !important;
+-		box-shadow:
+-			0 8px 24px rgba(255, 122, 217, 0.28),
+-			inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
++		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+ 		transition: transform 0.18s var(--wp-ease), box-shadow 0.2s ease,
+ 			background-position 0.4s ease !important;
+ 	}
+@@ -197,7 +191,7 @@
+ 		background-position: right center !important;
+ 		transform: translateY(-2px);
+ 		box-shadow:
+-			0 12px 30px rgba(255, 122, 217, 0.4),
++			0 0 28px rgba(255, 122, 217, 0.35),
+ 			0 0 24px rgba(255, 211, 77, 0.25),
+ 			inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+ 	}
+-- 
+2.52.0.windows.1
+

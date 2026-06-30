@@ -1,0 +1,9 @@
+﻿h4.png
+size:256,256
+format:RGBA8888
+filter:Linear,Linear
+repeat:none
+h4
+bounds:0,0,256,256
+offsets:0,0,256,256
+index:-1

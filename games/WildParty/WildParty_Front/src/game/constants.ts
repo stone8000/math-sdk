@@ -168,14 +168,11 @@ const explosion = {
 	sizeRatios: { width: 1, height: 1 },
 };
 
-// WildParty symbols are rendered as transparent PNG sprites (placeholder art).
-// Every state reuses the same sprite; swap files in
-// static/assets/sprites/wildPartySymbols/ or wire spine animations later.
+// WildParty symbols use PNG for static/spin/land/postWinStatic and generated
+// Spine assets for win state so winning symbols always animate via Spine.
 const HIGH_RATIOS = { width: HIGH_SYMBOL_SIZE, height: HIGH_SYMBOL_SIZE };
 const LOW_RATIOS = { width: LOW_SYMBOL_SIZE, height: LOW_SYMBOL_SIZE };
 const SPECIAL_RATIOS = { width: SPECIAL_SYMBOL_SIZE, height: SPECIAL_SYMBOL_SIZE };
-// slight "pop" on win so the matched symbols read clearly without a spine
-const WIN_BOOST = 1.2;
 
 const symbolSprite = (assetKey: string, ratios: { width: number; height: number }) => ({
 	type: 'sprite' as const,
@@ -183,29 +180,41 @@ const symbolSprite = (assetKey: string, ratios: { width: number; height: number 
 	sizeRatios: ratios,
 });
 
-const winSprite = (assetKey: string, ratios: { width: number; height: number }) =>
-	symbolSprite(assetKey, { width: ratios.width * WIN_BOOST, height: ratios.height * WIN_BOOST });
+const symbolSpine = (
+	assetKey: string,
+	animationName: string,
+	ratios: { width: number; height: number },
+) => ({
+	type: 'spine' as const,
+	assetKey,
+	animationName,
+	sizeRatios: ratios,
+});
 
-const spriteSymbol = (assetKey: string, ratios: { width: number; height: number }) => ({
+const mixedSymbol = (
+	spriteAssetKey: string,
+	winSpineAssetKey: string,
+	ratios: { width: number; height: number },
+) => ({
 	explosion,
-	static: symbolSprite(assetKey, ratios),
-	spin: symbolSprite(assetKey, ratios),
-	land: symbolSprite(assetKey, ratios),
-	postWinStatic: symbolSprite(assetKey, ratios),
-	win: winSprite(assetKey, ratios),
+	static: symbolSprite(spriteAssetKey, ratios),
+	spin: symbolSprite(spriteAssetKey, ratios),
+	land: symbolSprite(spriteAssetKey, ratios),
+	postWinStatic: symbolSprite(spriteAssetKey, ratios),
+	win: symbolSpine(winSpineAssetKey, 'win', ratios),
 });
 
 export const SYMBOL_INFO_MAP = {
-	H1: spriteSymbol('wpH1', HIGH_RATIOS),
-	H2: spriteSymbol('wpH2', HIGH_RATIOS),
-	H3: spriteSymbol('wpH3', HIGH_RATIOS),
-	H4: spriteSymbol('wpH4', HIGH_RATIOS),
-	L1: spriteSymbol('wpL1', LOW_RATIOS),
-	L2: spriteSymbol('wpL2', LOW_RATIOS),
-	L3: spriteSymbol('wpL3', LOW_RATIOS),
-	L4: spriteSymbol('wpL4', LOW_RATIOS),
-	W: spriteSymbol('wpW', SPECIAL_RATIOS),
-	S: spriteSymbol('wpS', SPECIAL_RATIOS),
+	H1: mixedSymbol('wpH1', 'wpSpH1', HIGH_RATIOS),
+	H2: mixedSymbol('wpH2', 'wpSpH2', HIGH_RATIOS),
+	H3: mixedSymbol('wpH3', 'wpSpH3', HIGH_RATIOS),
+	H4: mixedSymbol('wpH4', 'wpSpH4', HIGH_RATIOS),
+	L1: mixedSymbol('wpL1', 'wpSpL1', LOW_RATIOS),
+	L2: mixedSymbol('wpL2', 'wpSpL2', LOW_RATIOS),
+	L3: mixedSymbol('wpL3', 'wpSpL3', LOW_RATIOS),
+	L4: mixedSymbol('wpL4', 'wpSpL4', LOW_RATIOS),
+	W: mixedSymbol('wpW', 'wpSpW', SPECIAL_RATIOS),
+	S: mixedSymbol('wpS', 'wpSpS', SPECIAL_RATIOS),
 } as const;
 
 export const SCATTER_LAND_SOUND_MAP = {

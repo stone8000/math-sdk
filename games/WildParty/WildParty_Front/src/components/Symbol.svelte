@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SymbolSpine from './SymbolSpine.svelte';
 	import SymbolSprite from './SymbolSprite.svelte';
+	import SymbolWinAnim from './SymbolWinAnim.svelte';
 	import { getSymbolInfo } from '../game/utils';
 	import type { SymbolState, RawSymbol } from '../game/types';
 	import { getContext } from '../game/context';
@@ -19,9 +20,13 @@
 	const context = getContext();
 	const symbolInfo = $derived(getSymbolInfo({ rawSymbol: props.rawSymbol, state: props.state }));
 	const isSprite = $derived(symbolInfo.type === 'sprite');
+	const isWin = $derived(props.state === 'win');
 </script>
 
-{#if isSprite}
+{#if isSprite && isWin}
+	<!-- Win state for sprite symbols: programmatic scale+glow animation -->
+	<SymbolWinAnim {symbolInfo} x={props.x} y={props.y} oncomplete={props.oncomplete} />
+{:else if isSprite}
 	<SymbolSprite {symbolInfo} x={props.x} y={props.y} oncomplete={props.oncomplete} />
 {:else}
 	<SymbolSpine

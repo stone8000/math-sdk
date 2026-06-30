@@ -177,6 +177,86 @@ export default {
 		src: new URL('../../assets/sprites/wildPartySymbols/s.png', import.meta.url).href,
 		preload: true,
 	},
+	wpSpH1: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/h1.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/h1.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpH2: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/h2.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/h2.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpH3: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/h3.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/h3.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpH4: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/h4.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/h4.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpL1: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/l1.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/l1.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpL2: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/l2.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/l2.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpL3: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/l3.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/l3.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpL4: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/l4.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/l4.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpW: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/w.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/w.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
+	wpSpS: {
+		type: 'spine',
+		src: {
+			atlas: new URL('../../assets/spines/wildPartySymbols/s.atlas', import.meta.url).href,
+			skeleton: new URL('../../assets/spines/wildPartySymbols/s.json', import.meta.url).href,
+			scale: 1,
+		},
+	},
 	// Wild Party themed backgrounds (placeholder art — swap files in
 	// static/assets/sprites/wildPartyBackground/ to update the look)
 	wildPartyBgBase: {

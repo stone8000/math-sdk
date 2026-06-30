@@ -1,0 +1,84 @@
+﻿{
+  "skeleton": {
+    "hash": "wp-h4-auto",
+    "spine": "4.1.20",
+    "x": -128,
+    "y": -128,
+    "width": 256,
+    "height": 256,
+    "images": "./"
+  },
+  "bones": [
+    { "name": "root" },
+    { "name": "symbol", "parent": "root" }
+  ],
+  "slots": [
+    { "name": "symbol", "bone": "symbol", "attachment": "h4" }
+  ],
+  "skins": [
+    {
+      "name": "default",
+      "attachments": {
+        "symbol": {
+          "h4": { "x": 0, "y": 0, "width": 256, "height": 256 }
+        }
+      }
+    }
+  ],
+  "animations": {
+    "idle": {
+      "bones": {
+        "symbol": {
+          "scale": [
+            { "time": 0, "x": 1, "y": 1 },
+            { "time": 0.25, "x": 1.04, "y": 1.04 },
+            { "time": 0.5, "x": 1, "y": 1 },
+            { "time": 0.75, "x": 0.98, "y": 0.98 },
+            { "time": 1, "x": 1, "y": 1 }
+          ]
+        }
+      }
+    },
+    "win": {
+      "bones": {
+        "symbol": {
+          "scale": [
+            { "time": 0, "x": 1, "y": 1 },
+            { "time": 0.15, "x": 1.12, "y": 1.12 },
+            { "time": 0.3, "x": 1.18, "y": 1.18 },
+            { "time": 0.45, "x": 1.08, "y": 1.08 },
+            { "time": 0.6, "x": 1.14, "y": 1.14 },
+            { "time": 0.8, "x": 1, "y": 1 },
+            { "time": 1, "x": 1, "y": 1 }
+          ],
+          "rotate": [
+            { "time": 0, "value": 0 },
+            { "time": 0.2, "value": -2 },
+            { "time": 0.4, "value": 2 },
+            { "time": 0.6, "value": -1 },
+            { "time": 0.8, "value": 1 },
+            { "time": 1, "value": 0 }
+          ],
+          "translate": [
+            { "time": 0, "x": 0, "y": 0 },
+            { "time": 0.25, "x": 0, "y": 8 },
+            { "time": 0.5, "x": 0, "y": 0 },
+            { "time": 0.75, "x": 0, "y": 4 },
+            { "time": 1, "x": 0, "y": 0 }
+          ]
+        }
+      },
+      "slots": {
+        "symbol": {
+          "color": [
+            { "time": 0, "color": "ffffffff" },
+            { "time": 0.2, "color": "ffe7b8ff" },
+            { "time": 0.4, "color": "ffffffff" },
+            { "time": 0.6, "color": "ffe7b8ff" },
+            { "time": 1, "color": "ffffffff" }
+          ]
+        }
+      }
+    }
+  }
+}

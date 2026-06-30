@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-06-30（WildParty 符號 Spine 中獎動畫接入 + 前端重建）  
+> 最後更新：2026-06-30（報獎動畫回復原版 + TURBO 開關色彩強化）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -456,6 +456,18 @@ git -c http.version=HTTP/1.1 -c http.postBuffer=524288000 push mine main
 ```
 
 **Skill 版控規則：** Cursor `@stake-engine-local-dev` 已寫入「**每次改動必 commit**」；Agent 與接手者皆應遵守。
+
+### 4.15 第六波更新（2026-06-30）— 報獎回退 + TURBO 狀態色強化
+
+- [x] **報獎動畫回復原版流程**
+  - 移除自訂主題化報獎（gift / cocktail / champagne / disco ball）顯示層
+  - `Win.svelte` 回復為原本 big win spine 動畫流程
+  - `FreeSpinOutro.svelte` 回復為原本數字 spine (`fsOutroNumber`) 流程
+  - 刪除 `WinThemeShowcase.svelte`
+- [x] **TURBO 開關色彩強化（更容易辨識）**
+  - OFF：深灰按鈕底 + 淺灰閃電
+  - ON：橘色按鈕底 + 白色閃電（高對比）
+- [x] 前端重建並同步 `WildParty_Front/build/`（可直接上傳 Stake）
 
 ---
 

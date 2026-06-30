@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-06-14（Skill 總覽 `wild-party-skill-guide`、版控定稿）  
+> 最後更新：2026-06-30（WildParty 符號 Spine 中獎動畫接入 + 前端重建）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -259,7 +259,6 @@ games/WildParty/
 ### 4.8 尚未完成（需外部資源）
 
 - [ ] **派對主題音效／BGM**（**目前沿用範本 `sounds.json`，使用者確認可先上傳**）
-- [ ] **符號 spine 中獎動畫**（目前全狀態用 sprite；架構已預留）
 - [ ] **web-sdk 共享套件層級**修改（若要把 PayTable/Rules 寫回共用庫而非 app 本地覆寫）
 
 ### 4.9 第二波前端優化（已實作後撤回）
@@ -392,6 +391,25 @@ games/WildParty/
 | `aa5c393` | buy bonus 只保留 100x BONUS（betModeMeta override） |
 | `7a59929` | info 頁可滾動 + 規則/賠付內容補完 |
 | `b667754` | 簡單的 Wild Party CSS loader 取代範本佔位 |
+
+### 4.14 第五波更新（2026-06-30）— WildParty 符號 Spine 中獎動畫
+
+本次目標：讓中獎符號不是靜態 sprite，而是確實走 Spine 動畫。
+
+- [x] 新增 `static/assets/spines/wildPartySymbols/`（`h1~h4`、`l1~l4`、`w`、`s`）
+  - 每個符號包含 `.png + .atlas + .json`
+  - 每份 spine json 內含 `idle` / `win` 動畫
+- [x] `src/game/assets.ts` 註冊 `wpSpH1~wpSpS`（對應上述新 spine）
+- [x] `src/game/constants.ts` 調整 `SYMBOL_INFO_MAP`
+  - `static/spin/land/postWinStatic` 維持 WildParty PNG sprite
+  - `win` 改用 `type: 'spine'` + `animationName: 'win'`
+- [x] 前端重新 build，`build/` 產物已含 `assets/spines/wildPartySymbols/*`
+
+相關 commit（main）：
+
+| Commit | 說明 |
+|--------|------|
+| `caa5422` | 接入 WildParty 生成 Spine、切換 win 狀態走 spine、更新 build 產物 |
 
 ### 4.10 上傳黑屏修復（2026-06-13）— 目前可玩版
 
@@ -593,6 +611,7 @@ git checkout main && git merge feature/ui-v2
 | `src/components/ui/ModalPayTable.svelte` | 賠付表 |
 | `src/components/ui/ModalGameRules.svelte` | 遊戲規則 |
 | `static/assets/sprites/wildPartySymbols/` | 符號 PNG |
+| `static/assets/spines/wildPartySymbols/` | 符號 Spine（`idle`/`win`） |
 | `static/assets/sprites/wildPartyBackground/` | 背景 PNG |
 | `src/routes/+layout.svelte` | Loader 路徑（`${base}/stake-engine-loader.gif`） |
 | `vite.config.js` | `base: './'`（Stake 子路徑部署） |
@@ -625,9 +644,11 @@ git checkout main && git merge feature/ui-v2
 
 ### 7.2 符號渲染
 
-目前 **全部狀態**（`static` / `spin` / `land` / `win` / `postWinStatic`）都用 **sprite**。
+目前採用「**混合渲染**」：
+- `static` / `spin` / `land` / `postWinStatic`：`wildPartySymbols` PNG sprite
+- `win`：`wildPartySymbols` Spine（`animationName: 'win'`）
 
-日後要加 spine 動畫：在 `constants.ts` 的 `SYMBOL_INFO_MAP` 把對應狀態的 `type` 改回 `'spine'`，並在 `assets.ts` 保留 spine 定義即可（範本 spine 仍在 repo 內）。
+若要調整中獎動態節奏，直接改 `static/assets/spines/wildPartySymbols/*.json` 的 `animations.win` 參數即可。
 
 ### 7.3 本地 Modals 覆寫原因
 
@@ -694,6 +715,7 @@ pnpm build
 建置後確認：
 - `build/assets/sprites/wildPartySymbols/` 有 10 個 PNG
 - `build/assets/sprites/wildPartyBackground/` 有 `bg_base.png`、`bg_feature.png`
+- `build/assets/spines/wildPartySymbols/` 有 10 組 spine（`.json + .atlas + .png`）
 
 > **注意：** `pnpm build | tail` 可能因 esbuild 子進程而看似卡住；以 `build/index.html` 時間戳或 `pnpm build > build_log.txt 2>&1` 確認即可。
 

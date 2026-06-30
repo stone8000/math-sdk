@@ -303,4 +303,17 @@
 		font-weight: 700;
 		text-shadow: 0 0 12px rgba(255, 122, 217, 0.4);
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.wp-paytable,
+		.wp-row,
+		h2 {
+			animation: none !important;
+		}
+		.wp-row,
+		.wp-row:hover,
+		.wp-symbol-glow img {
+			transition: none !important;
+		}
+	}
 </style>

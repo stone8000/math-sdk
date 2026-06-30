@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-06-30（報獎動畫回復原版 + TURBO 開關色彩強化）  
+> 最後更新：2026-06-30（HTML UI 高級感升級 — 統一派對設計系統）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -469,6 +469,50 @@ git -c http.version=HTTP/1.1 -c http.postBuffer=524288000 push mine main
   - ON：橘色按鈕底 + 白色閃電（高對比）
 - [x] 前端重建並同步 `WildParty_Front/build/`（可直接上傳 Stake）
 
+### 4.16 第七波更新（2026-06-30）— HTML UI 高級感升級（統一派對設計系統）
+
+目標：把所有 **HTML 層 UI**（共享 modals + 本地 PayTable/Rules）統一成一套高級感的「派對」設計系統。
+
+**範圍說明（重要）：** 底部主控制列的 spin / bet / turbo / autoplay 按鈕是 **PixiJS**，由 web-sdk 的 `UiSprite.svelte` 渲染（見 §4.12），**不在 HTML 層**。本次只升級 **HTML 層**（modals 與其按鈕、面板、表單控件），不動 web-sdk、不動 Pixi 主控列、不動 loader 流程 → 風險低。
+
+參考 skill（`Slot-Casino-Game-Developer-Skills-for-Stake-Engine`）：
+- `ui-slot-ux-designer` — 控制階層、44px 觸控、`prefers-reduced-motion`、對比
+- `slot-ui-studio` — 共享元件治理、本地覆寫邊界
+- `css-motion-designer` — 短迴圈動效、palette 紀律
+
+**改動內容：**
+
+- [x] **設計 token 化**：`Modals.svelte` 新增 `:root` CSS 變數（金 `#ffd34d` → 粉 `#ff7ad9` → 紫 `#a855f7` 漸層、surface、line、ease），三個 modal 共用同一 palette
+  - 修正原本不一致：PayTable/Rules 用粉金、共享 modal 用素紫 → 現統一
+- [x] **按鈕分層**
+  - 圖示鈕（`.rectangle`）：玻璃質感 chip，hover 上浮 + 雙重發光 + 金色描邊
+  - 主要動作鈕（`button.primary` / `.confirm` / `[type=submit]` / `.buy-button`）：漸層填色 + **流動 sheen 掃光動畫** + hover 位移
+  - 次要鈕（`.secondary` / `.cancel`）：outlined glass
+- [x] **面板質感**：popup 頂緣漸層 hairline、radial 背景模糊（`.blur-layer`）、深紫毛玻璃內容區
+- [x] **表單控件**：checkbox → 漸層 pill 開關；range slider → 金色發光把手；input/select 聚焦光環
+- [x] **細節**：× 關閉鈕 hover 旋轉 90°、金額數字金色發光、漸層捲軸
+- [x] **可及性**：三個 modal 全套 `prefers-reduced-motion` fallback（關閉掃光/旋轉/位移）
+
+**檔案：**
+
+| 檔案 | 變更 |
+|------|------|
+| `src/components/ui/Modals.svelte` | 主升級 — 全域樣式系統重寫（design token、按鈕分層、表單控件、掃光動畫、reduced-motion） |
+| `src/components/ui/ModalPayTable.svelte` | 補 `prefers-reduced-motion` |
+| `src/components/ui/ModalGameRules.svelte` | 補 `prefers-reduced-motion` |
+
+> 純 HTML/CSS 樣式層，只會編進 `build/_app/` bundle，**不影響數學 `publish_files/`**（不用重傳數學）。
+
+**重建並上傳（在有 web-sdk monorepo 的本機執行）：**
+
+```bash
+cd ~/Stake_Engine/math-sdk/games/WildParty/WildParty_Front
+pnpm build            # → build/ 重新產生（CSS 編進 _app/）
+pnpm dev              # localhost:3001 開任一 modal 驗收新樣式
+```
+
+> ⚠️ 此次程式碼變更在獨立 clone 完成（無 web-sdk，無法在該環境 build）。**`pnpm build` 必須在 `~/Stake_Engine/` monorepo 本機跑**，再上傳 `build/`。
+
 ---
 
 ## 5. 常用指令
@@ -783,6 +827,7 @@ pnpm build
 | **buy bonus 出現無法遊玩的多餘選項** | 共享 `DEFAULT_BET_MODE_META` 範本含 6 模式且 `Authenticate` 不回寫；在遊戲端覆寫 `stateMeta.betModeMeta`（見 §4.13、`src/game/betModeMeta.ts`） |
 | **本地 modal（PayTable/Rules）無法滾動、點內容會關閉** | 共享 `Popup` 的 `.click-to-close-layer`（z-index:2）蓋住內容；本地內容容器需 `position:relative; z-index:100`（見 §4.13） |
 | info 頁顯示「Add Your Loader」/ 感覺沒 loader | 那是 web-sdk 範本 `LoaderExample` 佔位；用本地 `WildPartyLoader.svelte` 取代（見 §4.13） |
+| **單獨 clone `math-sdk`（無 web-sdk）無法 build** | app 依賴全為 `workspace:*`（web-sdk 套件 + 共享 config），單獨 clone 無 `node_modules`／無 monorepo → `pnpm install`／`pnpm build` 失敗。改 code 可在任何 clone，但 **`pnpm build` 必須在 `~/Stake_Engine/` 完整 monorepo 跑**（見 §4.16） |
 
 ---
 
@@ -850,6 +895,7 @@ bgm_base (loop), bgm_freegame (loop)
 | 22 | info 頁可滾動 + 補完內容 | Popup z-index 修復 + 規則補完；§4.13、`7a59929` |
 | 23 | 簡單 loader | `WildPartyLoader.svelte`；§4.13、`b667754` |
 | 24 | 送審 Game Details + 寫入交接 | §14 介紹文、§4.13、§9 踩坑 |
+| 25 | HTML UI 高級感升級 | 統一派對設計系統、按鈕分層、表單控件、reduced-motion；§4.16 |
 
 ---
 

@@ -242,4 +242,17 @@
 		line-height: 1.45;
 		letter-spacing: 0.02em;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.wp-rules,
+		.wp-card,
+		.wp-accent-bar,
+		h2 {
+			animation: none !important;
+		}
+		.wp-card,
+		.wp-card:hover {
+			transition: none !important;
+		}
+	}
 </style>

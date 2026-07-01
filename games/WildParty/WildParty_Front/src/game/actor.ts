@@ -21,10 +21,16 @@ const primaryMachines = createPrimaryMachines<Bet>({
 		if (lastRevealEvent) stateGameDerived.enhancedBoard.settle(lastRevealEvent.board);
 	},
 	onNewGameStart: async () => {
-		if ((stateBet.isTurbo && stateXstateDerived.isAutoBetting()) || stateBet.isSpaceHold) return;
+		if (stateBet.isSpaceHold) return;
+		const skipPreSpinInTurboAutoBet =
+			stateBet.isTurbo && stateXstateDerived.isAutoBetting() && stateGame.gameType !== 'freegame';
+		if (skipPreSpinInTurboAutoBet) return;
+
 		stateBet.winBookEventAmount = 0;
+		const forceNormalPreSpin = stateBet.isTurbo && stateGame.gameType === 'freegame';
 		await stateGameDerived.enhancedBoard.preSpin({
 			paddingBoard: config.paddingReels[stateGame.gameType],
+			isTurboBeforeAllOverride: forceNormalPreSpin ? false : undefined,
 		});
 	},
 	onNewGameError: () => stateGameDerived.enhancedBoard.settle(),

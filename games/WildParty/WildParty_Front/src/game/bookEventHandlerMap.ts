@@ -170,6 +170,17 @@ export const bookEventHandlerMap: BookEventHandlerMap<BookEvent, BookEventContex
 	freeSpinRetrigger: async (bookEvent: BookEventOfType<'freeSpinRetrigger'>) => {
 		eventEmitter.broadcast({ type: 'soundOnce', name: 'sfx_scatter_win_v2' });
 		await animateSymbols({ positions: bookEvent.positions });
+		const extraSpins = Math.max(0, bookEvent.totalFs - stateUi.freeSpinCounterTotal);
+		if (extraSpins > 0) {
+			eventEmitter.broadcast({ type: 'freeSpinIntroShow' });
+			eventEmitter.broadcast({ type: 'soundOnce', name: 'sfx_superfreespin' });
+			await eventEmitter.broadcastAsync({
+				type: 'freeSpinIntroUpdate',
+				totalFreeSpins: bookEvent.totalFs,
+				extraSpins,
+			});
+			eventEmitter.broadcast({ type: 'freeSpinIntroHide' });
+		}
 		eventEmitter.broadcast({ type: 'freeSpinCounterShow' });
 		stateUi.freeSpinCounterShow = true;
 		eventEmitter.broadcast({

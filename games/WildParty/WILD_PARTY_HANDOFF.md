@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-07-01（連線節奏/FreeGame Turbo/AutoSpin 選中辨識調整）  
+> 最後更新：2026-07-01（報獎圖示融合 + FreeGame Retrigger 提示）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -531,6 +531,24 @@ pnpm dev              # localhost:3001 開任一 modal 驗收新樣式
   - `packages/components-ui-html/src/components/AutoSpinsSingleWinLimit.svelte`
   - 選中項目改為明顯顏色辨識（紫底 + 金色文字高亮）
 - [x] 前端多次重建並同步 `WildParty_Front/build/`（可直接上傳 Stake）
+
+### 4.18 第九波更新（2026-07-01）— 報獎圖示融合與 Retrigger 提示
+
+- [x] **報獎圖示與字樣融合（同時出現）**
+  - 對應關係：
+    - BIG WIN → `h4`
+    - SUPER WIN → `h3`
+    - MEGA WIN → `h2`
+    - EPIC WIN → `h1`
+    - MAX WIN 維持不加圖示
+  - `src/components/Win.svelte`：圖示改為與原本 `WinAnimation` 同時顯示，位置調整為「上圖下字」並避免遮字
+  - `src/components/WinLevelSymbolIntro.svelte`：放大圖示呈現比例（不蓋住字樣）
+- [x] **修正 freegame 結束時圖示誤跳 bug**
+  - `src/components/FreeSpinOutro.svelte`：移除會在 outro 階段插入符號圖示的流程，恢復穩定顯示
+- [x] **FreeGame retrigger 提示流程**
+  - `src/game/bookEventHandlerMap.ts`：`freeSpinRetrigger` 時加入與進入 freegame 類似的提示流程（顯示新增 spins）
+  - `src/components/FreeSpinIntro.svelte`：`freeSpinIntroUpdate` 支援 `extraSpins` 欄位，優先顯示 retrigger 增加次數
+- [x] 前端重建並同步 `WildParty_Front/build/`
 
 ---
 

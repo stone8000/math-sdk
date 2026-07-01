@@ -2,7 +2,7 @@
 	export type EmitterEventFreeSpinIntro =
 		| { type: 'freeSpinIntroShow' }
 		| { type: 'freeSpinIntroHide' }
-		| { type: 'freeSpinIntroUpdate'; totalFreeSpins: number };
+		| { type: 'freeSpinIntroUpdate'; totalFreeSpins: number; extraSpins?: number };
 </script>
 
 <script lang="ts">
@@ -29,11 +29,7 @@
 		freeSpinIntroShow: () => (show = true),
 		freeSpinIntroHide: () => (show = false),
 		freeSpinIntroUpdate: async (emitterEvent) => {
-			// if (emitterEvent.extraSpins) {
-			// 	context.eventEmitter.broadcast({ type: 'soundOnce', name: 'sfx_fs_respins' });
-			// }
-			// freeSpinsFromEvent = emitterEvent.extraSpins ?? emitterEvent.totalFreeSpins;
-			freeSpinsFromEvent = emitterEvent.totalFreeSpins;
+			freeSpinsFromEvent = emitterEvent.extraSpins ?? emitterEvent.totalFreeSpins;
 			await waitForResolve((resolve) => (oncomplete = resolve));
 		},
 	});

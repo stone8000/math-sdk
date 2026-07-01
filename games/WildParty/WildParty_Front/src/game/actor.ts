@@ -25,10 +25,6 @@ const primaryMachines = createPrimaryMachines<Bet>({
 		stateBet.winBookEventAmount = 0;
 		if (stateBet.isSpaceHold) return;
 
-		// Basegame pre-spin is handled in onPlayGame so we can inject the
-		// pre-freegame hint animation before reels start spinning.
-		if (stateGame.gameType !== 'freegame') return;
-
 		const skipPreSpinInTurboAutoBet =
 			stateBet.isTurbo && stateXstateDerived.isAutoBetting() && stateGame.gameType !== 'freegame';
 		if (skipPreSpinInTurboAutoBet) return;
@@ -45,14 +41,6 @@ const primaryMachines = createPrimaryMachines<Bet>({
 			const hasFreeSpinTrigger = bet.state.some((bookEvent) => bookEvent.type === 'freeSpinTrigger');
 			if (hasFreeSpinTrigger) {
 				await eventEmitter.broadcastAsync({ type: 'preFreeGameHintShow' });
-			}
-
-			const skipPreSpinInTurboAutoBet =
-				stateBet.isTurbo && stateXstateDerived.isAutoBetting() && !hasFreeSpinTrigger;
-			if (!stateBet.isSpaceHold && !skipPreSpinInTurboAutoBet) {
-				await stateGameDerived.enhancedBoard.preSpin({
-					paddingBoard: config.paddingReels[stateGame.gameType],
-				});
 			}
 		}
 

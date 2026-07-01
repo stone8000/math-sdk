@@ -8,20 +8,30 @@
 
 	type Props = {
 		onpress: () => void;
+		position?: 'bottom' | 'betweenBoardAndBottom';
 	};
 
 	const props: Props = $props();
 	const context = getContext();
-</script>
 
-<MainContainer alignVertical="bottom">
-	<Sprite
-		key="pressToContinueText_{stateUrlDerived.lang()}.png"
+	const yPosition = $derived.by(() => {
+		if (props.position !== 'betweenBoardAndBottom') {
+			return context.stateLayoutDerived.mainLayout().height;
+		}
+		const board = context.stateGameDerived.boardLayout();
+		const main = context.stateLayoutDerived.mainLayout();
+		return (board.y + board.height * 0.5 + main.height) * 0.5;
+	});
+	</script>
+
+	<MainContainer alignVertical="bottom">
+		<Sprite
+			key="pressToContinueText_{stateUrlDerived.lang()}.png"
 		width={800}
 		height={134}
 		anchor={{ x: 0.5, y: 1 }}
 		x={context.stateLayoutDerived.mainLayout().width * 0.5}
-		y={context.stateLayoutDerived.mainLayout().height}
+		y={yPosition}
 	/>
 </MainContainer>
 <OnHotkey hotkey="Space" onpress={() => props.onpress()} />

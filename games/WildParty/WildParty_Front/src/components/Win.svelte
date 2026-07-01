@@ -115,7 +115,10 @@
 
 				<WinCoins emit={!countUpCompleted} levelAlias={winLevelData?.alias} />
 
-				<PressToContinue onpress={() => (countUpCompleted ? oncomplete() : finishCountUp())} />
+				<PressToContinue
+					position="betweenBoardAndBottom"
+					onpress={() => (countUpCompleted ? oncomplete() : finishCountUp())}
+				/>
 			{/snippet}
 		</WinCountUpProvider>
 	{/if}

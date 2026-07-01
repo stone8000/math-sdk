@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-06-30（HTML UI 高級感升級 — 統一派對設計系統）  
+> 最後更新：2026-07-01（多人協作 build 衝突風險提醒）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -670,6 +670,41 @@ git push origin main
 
 **判斷 build 是否為新版：** 看 `build/index.html` 時間戳。若不是「剛剛」，build 沒成功重跑
 （vite 完成後 node 程序常不自動退出、看似卡住，見 §9）。
+
+### 5.8 ⚠️ 多人協作風險 — `build/` 是黑盒子，可能互相蓋掉對方成果
+
+**背景（2026-07-01 發現）：** 這個 repo 只追蹤 `src/`（math-sdk 內容）與編譯後的 `build/`；
+**web-sdk（Pixi 主控列、`UiSprite.svelte` 等共用元件）完全不在這個 repo 裡**，只存在於每個人
+自己本機的 `~/Stake_Engine/web-sdk`。
+
+**問題：** 有人在自己機器改了 web-sdk（例如調整按鈕外觀），`pnpm build` 後只把 **編譯結果**
+`build/` push 上來 —— `src/` 完全不變，但 `build/` 已經包含那次 web-sdk 改動的效果。
+
+- 這類 commit 的特徵：`git diff --stat` 只顯示 `build/_app/*`、`build/index.html`、
+  `build/_app/version.json` 變動，**沒有任何 `src/` 檔案**。
+- 已知案例：2026-06-30 深夜（Mac，UiSprite 按鈕樣式調整）、2026-07-01（協作者
+  `yuping.chen`，commit `b62aa83`「Remove gray UI underlays」）— 兩次都只動 `build/`。
+
+**風險：** 若接著有人（含你自己在別台機器）對 `src/` 重新 `pnpm build`，會用**那台機器自己的
+web-sdk 版本**編譯 —— 若沒有前面那次 web-sdk 改動，新產生的 `build/` 會**悄悄蓋掉**前一位的
+成果。`git diff` 只會顯示「build 檔案變了」，看不出蓋掉了什麼內容，因為 bundle 是 minify 過的。
+
+**規則（多人協作時務必遵守）：**
+
+1. **在自己機器對 `src/` 做 `pnpm build` 上傳前，先問：「最近是否有人只改了 `build/`？」**
+   → 用 `git log --stat -- games/WildParty/WildParty_Front/build` 快速掃描：若某 commit
+   只碰 `build/` 沒碰 `src/`，代表那是一次「web-sdk-only」改動，你的 rebuild 會蓋掉它。
+2. 若發現有這類 commit，**先找對方確認他在 web-sdk 改了什麼**，能的話把邏輯寫回這個 repo
+   能控制的範圍（app 本地 CSS override，見 §7.3）或明確記錄在本文件，而不是只留在
+   個人機器的 web-sdk。
+3. 大改前先 `git log --oneline -5 -- .../build` 看最新 build commit 是誰、何時、訊息為何，
+   push 前主動同步。
+4. 若真的蓋掉了，可用 `git revert` 或從對方的 commit `git checkout <hash> -- .../build`
+   取回，**不要用 `git reset --hard` 蓋別人的遠端分支**（除非已備份，見下）。
+
+**已建立的安全網：** 2026-07-01 曾發生誤解導致 force-push 回退 main；回退前已把當時遠端
+版本備份到分支 **`backup-mac-20260701`**（GitHub 上永久保留）。往後若需要強制回退 main，
+先 `git branch backup-<誰-日期> <要蓋掉的 commit>` 並 push 該分支，再動 `main`。
 
 ---
 

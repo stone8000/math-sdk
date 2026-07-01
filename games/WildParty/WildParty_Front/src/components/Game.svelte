@@ -29,6 +29,7 @@
 	import FreeSpinOutro from './FreeSpinOutro.svelte';
 	import Transition from './Transition.svelte';
 	import I18nTest from './I18nTest.svelte';
+	import PreFreeGameHint from './PreFreeGameHint.svelte';
 
 	const context = getContext();
 
@@ -95,6 +96,7 @@
 			<FreeSpinCounter />
 		{/if}
 		<FreeSpinOutro />
+		<PreFreeGameHint />
 		<Transition />
 
 		<I18nTest />

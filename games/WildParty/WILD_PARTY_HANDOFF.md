@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-07-01（報獎圖示融合 + FreeGame Retrigger 提示）  
+> 最後更新：2026-07-01（報獎圖示融合 + Pre-FreeGame 提示 + 報獎重複字樣修正）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -969,6 +969,7 @@ bgm_base (loop), bgm_freegame (loop)
 | 23 | 簡單 loader | `WildPartyLoader.svelte`；§4.13、`b667754` |
 | 24 | 送審 Game Details + 寫入交接 | §14 介紹文、§4.13、§9 踩坑 |
 | 25 | HTML UI 高級感升級 | 統一派對設計系統、按鈕分層、表單控件、reduced-motion；§4.16 |
+| 26 | 報獎/FreeGame 動效調整與修正 | 新增 H1 預中飛行提示（進 FreeGame 前），保留 4 種報獎圖示融合；移除後加的重複報獎字樣，重新 build 並同步 `WildParty_Front/build` |
 
 ---
 

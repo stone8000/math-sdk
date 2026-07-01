@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-07-01（報獎圖示融合 + Pre-FreeGame 提示 + 報獎重複字樣修正；多人協作 build 衝突風險提醒）  
+> 最後更新：2026-07-01（報獎修正 + Pre-FreeGame 提示 + SilverStars 載入頁；多人協作 build 衝突風險提醒）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -1005,6 +1005,7 @@ bgm_base (loop), bgm_freegame (loop)
 | 24 | 送審 Game Details + 寫入交接 | §14 介紹文、§4.13、§9 踩坑 |
 | 25 | HTML UI 高級感升級 | 統一派對設計系統、按鈕分層、表單控件、reduced-motion；§4.16 |
 | 26 | 報獎/FreeGame 動效調整與修正 | 新增 H1 預中飛行提示（進 FreeGame 前），保留 4 種報獎圖示融合；移除後加的重複報獎字樣，重新 build 並同步 `WildParty_Front/build` |
+| 27 | 載入頁改為發行商風格 | `WildPartyLoader.svelte` 改為黑底白字（SILVERSTARS / STUDIO）+ 白框星形與 777；保留 `static/silverstar.png` 供後續美術調整，重新 build 並同步 |
 
 ---
 

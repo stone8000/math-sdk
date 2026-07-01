@@ -24,9 +24,22 @@
 {#if show}
 	<div class="wp-loader" transition:fade={{ duration: 400 }}>
 		<div class="wp-loader-inner">
-			<div class="wp-title">WILD PARTY</div>
-			<div class="wp-spinner"></div>
-			<div class="wp-text">LOADING…</div>
+			<div class="wp-star-wrap" aria-label="Silverstars 777 star">
+				<svg class="wp-star" viewBox="0 0 100 100" role="img">
+					<polygon
+						points="50,7 61,38 94,38 67,57 77,89 50,70 23,89 33,57 6,38 39,38"
+						fill="none"
+						stroke="#ffffff"
+						stroke-width="5.5"
+						stroke-linejoin="round"
+					/>
+					<text x="50" y="56" text-anchor="middle" dominant-baseline="middle">777</text>
+				</svg>
+			</div>
+			<div class="wp-title">
+				<div>SILVERSTARS</div>
+				<div>STUDIO</div>
+			</div>
 		</div>
 	</div>
 {/if}
@@ -39,47 +52,48 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: radial-gradient(circle at 50% 40%, #1a0533 0%, #07010f 70%);
+		background: #000;
 	}
 
 	.wp-loader-inner {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.4rem;
+		gap: 0.85rem;
+		font-family: 'proxima-nova', Arial, sans-serif;
+	}
+
+	.wp-star-wrap {
+		width: clamp(140px, 20vw, 240px);
+		aspect-ratio: 1 / 1;
+	}
+
+	.wp-star {
+		width: 100%;
+		height: 100%;
+		display: block;
+		filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.25));
+	}
+
+	.wp-star text {
+		fill: #fff;
+		font-size: 18px;
+		font-weight: 900;
+		letter-spacing: 0;
 		font-family: 'proxima-nova', Arial, sans-serif;
 	}
 
 	.wp-title {
-		font-size: 2.2rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		font-size: clamp(2rem, 4.2vw, 4rem);
 		font-weight: 900;
 		letter-spacing: 0.12em;
-		background: linear-gradient(135deg, #ffd34d 0%, #ff7ad9 50%, #a855f7 100%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		-webkit-text-fill-color: transparent;
-		filter: drop-shadow(0 0 18px rgba(255, 122, 217, 0.5));
-	}
-
-	.wp-spinner {
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		border: 4px solid rgba(255, 255, 255, 0.12);
-		border-top-color: #ff7ad9;
-		border-right-color: #ffd34d;
-		animation: wp-spin 0.8s linear infinite;
-	}
-
-	.wp-text {
-		font-size: 0.8rem;
-		letter-spacing: 0.3em;
-		color: rgba(255, 255, 255, 0.55);
-	}
-
-	@keyframes wp-spin {
-		to {
-			transform: rotate(360deg);
-		}
+		color: #fff;
+		text-align: center;
+		line-height: 1;
+		text-shadow: 0 0 16px rgba(255, 255, 255, 0.28);
 	}
 </style>

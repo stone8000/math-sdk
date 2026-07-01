@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-07-01（多人協作 build 衝突風險提醒）  
+> 最後更新：2026-07-01（報獎圖示融合 + Pre-FreeGame 提示 + 報獎重複字樣修正；多人協作 build 衝突風險提醒）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -513,6 +513,43 @@ pnpm dev              # localhost:3001 開任一 modal 驗收新樣式
 
 > ⚠️ 此次程式碼變更在獨立 clone 完成（無 web-sdk，無法在該環境 build）。**`pnpm build` 必須在 `~/Stake_Engine/` monorepo 本機跑**，再上傳 `build/`。
 
+### 4.17 第八波更新（2026-07-01）— 節奏手感與 AutoSpin 可視化修正
+
+- [x] **得分連線演繹加快**
+  - `src/components/WinLines.svelte`
+  - `WIN_LINE_STEP_DELAY_FAST`: `120 → 70`
+  - `WIN_LINE_STEP_DELAY_NORMAL`: `280 → 140`
+  - `WIN_LINE_END_DELAY`: `150 → 80`
+- [x] **FreeGame + Turbo 轉輪節奏放慢（修正「停輪後下一轉過快」）**
+  - `src/game/constants.ts`：新增 `SPIN_OPTIONS_FAST_FREEGAME`（較慢的 `reelPreSpinSpeed/reelSpinSpeed` 與較長 `reelSpinDelay`）
+  - `src/game/stateGame.svelte.ts`：`freegame + fast` 時改用 `SPIN_OPTIONS_FAST_FREEGAME`
+  - `src/game/actor.ts`：調整 `onNewGameStart`，避免 freegame turbo 走過快 preSpin 路徑
+  - `packages/utils-slots/src/createEnhanceBoardPreSpin.ts`：新增 `isTurboBeforeAllOverride`，允許遊戲端覆寫 preSpin turbo 判定
+- [x] **AutoSpin 選單選中態可視化**
+  - `packages/components-ui-html/src/components/AutoSpinsOptions.svelte`
+  - `packages/components-ui-html/src/components/AutoSpinsLossLimit.svelte`
+  - `packages/components-ui-html/src/components/AutoSpinsSingleWinLimit.svelte`
+  - 選中項目改為明顯顏色辨識（紫底 + 金色文字高亮）
+- [x] 前端多次重建並同步 `WildParty_Front/build/`（可直接上傳 Stake）
+
+### 4.18 第九波更新（2026-07-01）— 報獎圖示融合與 Retrigger 提示
+
+- [x] **報獎圖示與字樣融合（同時出現）**
+  - 對應關係：
+    - BIG WIN → `h4`
+    - SUPER WIN → `h3`
+    - MEGA WIN → `h2`
+    - EPIC WIN → `h1`
+    - MAX WIN 維持不加圖示
+  - `src/components/Win.svelte`：圖示改為與原本 `WinAnimation` 同時顯示，位置調整為「上圖下字」並避免遮字
+  - `src/components/WinLevelSymbolIntro.svelte`：放大圖示呈現比例（不蓋住字樣）
+- [x] **修正 freegame 結束時圖示誤跳 bug**
+  - `src/components/FreeSpinOutro.svelte`：移除會在 outro 階段插入符號圖示的流程，恢復穩定顯示
+- [x] **FreeGame retrigger 提示流程**
+  - `src/game/bookEventHandlerMap.ts`：`freeSpinRetrigger` 時加入與進入 freegame 類似的提示流程（顯示新增 spins）
+  - `src/components/FreeSpinIntro.svelte`：`freeSpinIntroUpdate` 支援 `extraSpins` 欄位，優先顯示 retrigger 增加次數
+- [x] 前端重建並同步 `WildParty_Front/build/`
+
 ---
 
 ## 5. 常用指令
@@ -967,6 +1004,7 @@ bgm_base (loop), bgm_freegame (loop)
 | 23 | 簡單 loader | `WildPartyLoader.svelte`；§4.13、`b667754` |
 | 24 | 送審 Game Details + 寫入交接 | §14 介紹文、§4.13、§9 踩坑 |
 | 25 | HTML UI 高級感升級 | 統一派對設計系統、按鈕分層、表單控件、reduced-motion；§4.16 |
+| 26 | 報獎/FreeGame 動效調整與修正 | 新增 H1 預中飛行提示（進 FreeGame 前），保留 4 種報獎圖示融合；移除後加的重複報獎字樣，重新 build 並同步 `WildParty_Front/build` |
 
 ---
 

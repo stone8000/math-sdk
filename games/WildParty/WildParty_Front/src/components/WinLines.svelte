@@ -38,9 +38,9 @@
 		points: { x: number; y: number }[];
 	};
 
-	const WIN_LINE_STEP_DELAY_FAST = 120;
-	const WIN_LINE_STEP_DELAY_NORMAL = 280;
-	const WIN_LINE_END_DELAY = 150;
+	const WIN_LINE_STEP_DELAY_FAST = 50;
+	const WIN_LINE_STEP_DELAY_NORMAL = 70;
+	const WIN_LINE_END_DELAY = 50;
 
 	let drawnLines = $state<DrawnLine[]>([]);
 	let show = $state(false);

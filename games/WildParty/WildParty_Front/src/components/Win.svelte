@@ -17,6 +17,7 @@
 
 	import WinCoins from './WinCoins.svelte';
 	import WinAnimation from './WinAnimation.svelte';
+	import WinLevelSymbolIntro from './WinLevelSymbolIntro.svelte';
 	import PressToContinue from './PressToContinue.svelte';
 	import { SYMBOL_SIZE } from '../game/constants';
 	import { getContext } from '../game/context';
@@ -28,6 +29,15 @@
 	let winLevelData = $state<WinLevelData>();
 	let oncomplete = $state(() => {});
 	let onCountUpComplete = $state(() => {});
+
+	const WIN_LEVEL_SYMBOL_MAP: Partial<
+		Record<WinLevelData['alias'], 'wpSpH1' | 'wpSpH2' | 'wpSpH3' | 'wpSpH4'>
+	> = {
+		big: 'wpSpH4',
+		superwin: 'wpSpH3',
+		mega: 'wpSpH2',
+		epic: 'wpSpH1',
+	};
 
 	context.eventEmitter.subscribeOnMount({
 		winShow: () => (show = true),
@@ -63,10 +73,17 @@
 						x={context.stateGameDerived.boardLayout().x}
 						y={context.stateGameDerived.boardLayout().y}
 					>
+						{@const winLevelSymbolKey = WIN_LEVEL_SYMBOL_MAP[winLevelData.alias]}
 						{#if winLevelData?.animation}
 							<WinAnimation animationMap={winLevelData.animation}>
+								{#if winLevelSymbolKey}
+									<Container y={-250}>
+										<WinLevelSymbolIntro symbolKey={winLevelSymbolKey} />
+									</Container>
+								{/if}
 								<ResponsiveBitmapText
 									anchor={0.5}
+									y={winLevelSymbolKey ? 180 : 0}
 									maxWidth={2130}
 									text={bookEventAmountToCurrencyString(countUpAmount)}
 									style={{

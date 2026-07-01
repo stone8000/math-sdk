@@ -16,6 +16,7 @@ import {
 	BOARD_DIMENSIONS,
 	SPIN_OPTIONS_DEFAULT,
 	SPIN_OPTIONS_FAST,
+	SPIN_OPTIONS_FAST_FREEGAME,
 	INITIAL_SYMBOL_STATE,
 	SCATTER_LAND_SOUND_MAP,
 } from './constants';
@@ -53,8 +54,11 @@ const board = _.range(BOARD_DIMENSIONS.x).map((reelIndex) => {
 		onSymbolLand,
 	});
 
-	reel.reelState.spinOptions = () =>
-		reel.reelState.spinType === 'fast' ? SPIN_OPTIONS_FAST : SPIN_OPTIONS_DEFAULT;
+	reel.reelState.spinOptions = () => {
+		if (reel.reelState.spinType !== 'fast') return SPIN_OPTIONS_DEFAULT;
+		if (stateGame.gameType === 'freegame') return SPIN_OPTIONS_FAST_FREEGAME;
+		return SPIN_OPTIONS_FAST;
+	};
 
 	return reel;
 });

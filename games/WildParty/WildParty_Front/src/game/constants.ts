@@ -10,19 +10,19 @@ export const REEL_PADDING = 0.53;
 export const INITIAL_BOARD: RawSymbol[][] = [
 	[
 		{
-			name: 'L2',
+			name: 'H1',
 		},
 		{
-			name: 'L1',
+			name: 'H1',
 		},
 		{
-			name: 'L4',
+			name: 'H1',
 		},
 		{
-			name: 'H2',
+			name: 'H1',
 		},
 		{
-			name: 'L1',
+			name: 'H1',
 		},
 	],
 	[
@@ -30,61 +30,61 @@ export const INITIAL_BOARD: RawSymbol[][] = [
 			name: 'H1',
 		},
 		{
-			name: 'L3',
+			name: 'H1',
 		},
 		{
-			name: 'L2',
+			name: 'H1',
 		},
 		{
-			name: 'H3',
+			name: 'H1',
 		},
 		{
-			name: 'L4',
-		},
-	],
-	[
-		{
-			name: 'L3',
-		},
-		{
-			name: 'L1',
-		},
-		{
-			name: 'L3',
-		},
-		{
-			name: 'H4',
-		},
-		{
-			name: 'L4',
+			name: 'H1',
 		},
 	],
 	[
 		{
-			name: 'H4',
+			name: 'H1',
 		},
 		{
-			name: 'H3',
+			name: 'H1',
 		},
 		{
-			name: 'L4',
+			name: 'H1',
 		},
 		{
-			name: 'L2',
+			name: 'H1',
 		},
 		{
-			name: 'L1',
+			name: 'H1',
 		},
 	],
 	[
 		{
-			name: 'H3',
+			name: 'H1',
 		},
 		{
-			name: 'L3',
+			name: 'H1',
 		},
 		{
-			name: 'L3',
+			name: 'H1',
+		},
+		{
+			name: 'H1',
+		},
+		{
+			name: 'H1',
+		},
+	],
+	[
+		{
+			name: 'H1',
+		},
+		{
+			name: 'H1',
+		},
+		{
+			name: 'H1',
 		},
 		{
 			name: 'H1',
@@ -149,6 +149,14 @@ export const SPIN_OPTIONS_FAST = {
 	reelPreSpinSpeed: 5,
 	reelSpinSpeed: 5,
 	reelBounceSizeMulti: 0.05,
+};
+
+export const SPIN_OPTIONS_FAST_FREEGAME = {
+	...SPIN_OPTIONS_SHARED,
+	reelPreSpinSpeed: 4.2,
+	reelSpinSpeed: 3.8,
+	reelSpinDelay: 300,
+	reelBounceSizeMulti: 0.08,
 };
 
 export const MOTION_BLUR_VELOCITY = 31;

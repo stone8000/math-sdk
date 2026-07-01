@@ -1,6 +1,6 @@
 # Wild Party — 專案交接文件
 
-> 最後更新：2026-07-01（SilverStars 載入頁 + 背景旋轉/光束動效；多人協作 build 衝突風險提醒）  
+> 最後更新：2026-07-01（SilverStars 載入頁 + 背景旋轉/光束動效 + LoadingScreen 文案大寫）  
 > 涵蓋範圍：math-sdk 數學後端 + `WildParty_Front` 前端 + Stake 上架素材  
 > **Skill 路由：** `@wild-party-skill-guide`｜**交接：** `@WILD_PARTY_HANDOFF.md`
 
@@ -1007,6 +1007,7 @@ bgm_base (loop), bgm_freegame (loop)
 | 26 | 報獎/FreeGame 動效調整與修正 | 新增 H1 預中飛行提示（進 FreeGame 前），保留 4 種報獎圖示融合；移除後加的重複報獎字樣，重新 build 並同步 `WildParty_Front/build` |
 | 27 | 載入頁改為發行商風格 | `WildPartyLoader.svelte` 改為黑底白字（SILVERSTARS / STUDIO）+ 白框星形與 777；保留 `static/silverstar.png` 供後續美術調整，重新 build 並同步 |
 | 28 | 背景動態強化（疲乏感優化） | `Background.svelte` 新增主遊戲上方與 FreeGame 左上 disco ball 旋轉，並加入上半部低透明度光束掃描；版本註記：**v59 無旋轉背景，v60 有旋轉背景** |
+| 29 | 第三頁 LoadingScreen 文案調整 | 保留並改為全大寫：`3X5, 35 LINES MAX WIN 5,000X`；發行商頁維持 SilverStars 畫面，精緻化套用在 `LoadingScreen.svelte` |
 
 ---
 

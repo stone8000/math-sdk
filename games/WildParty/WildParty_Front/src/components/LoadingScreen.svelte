@@ -2,6 +2,7 @@
 	import { Container, Graphics, Text, Sprite } from 'pixi-svelte';
 	import { FadeContainer } from 'components-pixi';
 	import { MainContainer } from 'components-layout';
+	import { onMount } from 'svelte';
 
 	import { getContext } from '../game/context';
 	import TransitionAnimation from './TransitionAnimation.svelte';
@@ -15,6 +16,7 @@
 	const context = getContext();
 
 	let loadingType = $state<'start' | 'transition'>('start');
+	let pulseTick = $state(0);
 
 	// Animate progress bar smoothly
 	let animatedProgress = $state(0);
@@ -28,6 +30,13 @@
 			}
 		}, 25);
 		return () => clearInterval(interval);
+	});
+
+	onMount(() => {
+		const id = setInterval(() => {
+			pulseTick += 1;
+		}, 32);
+		return () => clearInterval(id);
 	});
 </script>
 
@@ -50,8 +59,30 @@
 				const w = context.stateLayoutDerived.mainLayout().width;
 				const h = context.stateLayoutDerived.mainLayout().height;
 				g.clear();
-				g.beginFill(0x050010, 0.75);
+				g.beginFill(0x050010, 0.68);
 				g.drawRect(0, 0, w, h);
+				g.endFill();
+
+				// subtle vignette / top glow so the screen looks less flat
+				g.beginFill(0xff95dc, 0.04);
+				g.drawEllipse(w * 0.5, h * 0.28, w * 0.22, h * 0.11);
+				g.endFill();
+
+				g.beginFill(0x000000, 0.22);
+				g.drawRect(0, h * 0.72, w, h * 0.28);
+				g.endFill();
+			}}
+		/>
+
+		<Graphics
+			draw={(g) => {
+				const w = context.stateLayoutDerived.mainLayout().width;
+				const h = context.stateLayoutDerived.mainLayout().height;
+				const glowX = w * 0.5 + Math.sin(pulseTick / 48) * w * 0.08;
+				const glowAlpha = 0.03 + 0.015 * (0.5 + 0.5 * Math.sin(pulseTick / 22));
+				g.clear();
+				g.beginFill(0xffd67c, glowAlpha);
+				g.drawEllipse(glowX, h * 0.34, w * 0.26, h * 0.1);
 				g.endFill();
 			}}
 		/>
@@ -68,12 +99,14 @@
 					fontFamily: 'proxima-nova, Arial, sans-serif',
 					fontSize: 56,
 					fontWeight: '900',
-					fill: 0xffffff,
+					fill: 0xfff4cf,
 					letterSpacing: 8,
 					dropShadow: true,
-					dropShadowColor: 0xcc00ff,
-					dropShadowBlur: 16,
+					dropShadowColor: 0xff9edf,
+					dropShadowBlur: 18,
 					dropShadowDistance: 0,
+					stroke: 0xffffff,
+					strokeThickness: 1,
 				}}
 			/>
 
@@ -81,12 +114,12 @@
 			<Text
 				anchor={0.5}
 				y={65}
-				text="5×3 · 35 LINES · MAX WIN 5,000×"
+				text="3X5, 35 LINES MAX WIN 5,000X"
 				style={{
 					fontFamily: 'proxima-nova, Arial, sans-serif',
 					fontSize: 14,
-					fontWeight: '500',
-					fill: 0xccccdd,
+					fontWeight: '600',
+					fill: 0xd9d8e8,
 					letterSpacing: 3,
 				}}
 			/>
@@ -104,13 +137,13 @@
 					const barHeight = 4;
 					g.clear();
 					// Background track
-					g.beginFill(0x222233, 0.6);
+					g.beginFill(0x2a2338, 0.82);
 					g.drawRoundedRect(-barWidth / 2, -barHeight / 2, barWidth, barHeight, 2);
 					g.endFill();
 					// Progress fill
 					const fillWidth = (barWidth * animatedProgress) / 100;
 					if (fillWidth > 0) {
-						g.beginFill(0xcc44ff, 0.9);
+						g.beginFill(0xff8ede, 0.94);
 						g.drawRoundedRect(-barWidth / 2, -barHeight / 2, fillWidth, barHeight, 2);
 						g.endFill();
 					}
@@ -121,12 +154,14 @@
 			<Text
 				anchor={0.5}
 				y={20}
-				text={context.stateApp.loaded ? 'TAP TO CONTINUE' : `${Math.round(animatedProgress)}%`}
+				text={context.stateApp.loaded
+					? 'TAP TO CONTINUE'
+					: `LOADING ${Math.round(animatedProgress)}%`}
 				style={{
 					fontFamily: 'proxima-nova, Arial, sans-serif',
 					fontSize: 12,
-					fontWeight: '400',
-					fill: 0x9988aa,
+					fontWeight: '500',
+					fill: 0xb6a8c9,
 					letterSpacing: 2,
 				}}
 			/>
